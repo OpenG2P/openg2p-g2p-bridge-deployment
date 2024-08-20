@@ -19,10 +19,10 @@ metadata:
   name: {{ $fullName }}
   labels:
     {{- include "g2p-bridge.labels" . | nindent 4 }}
-  {{- with .Values.ingress.annotations }}
+    {{- with .Values.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
-  {{- end }}
+    {{- end }}
 spec:
   {{- if and .Values.ingress.className (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion) }}
   ingressClassName: {{ .Values.ingress.className }}

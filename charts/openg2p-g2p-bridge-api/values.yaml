@@ -1,6 +1,30 @@
 global:
   g2pBridgeHostname: g2p-bridge.dev.openg2p.org
 
+hostname: g2p-bridge.dev.openg2p.org
+nameOverride: openg2p-g2p-bridge-api
+fullnameOverride: openg2p-g2p-bridge-api
+
+## Pod extra labels
+## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+##
+podLabels:
+  app.kubernetes.io/name: openg2p-g2p-bridge-api
+
+## Add labels to all the deployed resources
+##
+commonLabels:
+  app.kubernetes.io/group: openg2p-g2p-bridge
+
+## Add annotations to all the deployed resources
+##
+commonAnnotations: {}
+
+## Annotations for server pods.
+## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+##
+podAnnotations: {}
+
 replicaCount: 1
 
 ## Update strategy - only really applicable for deployments with RWO PVs attached
@@ -10,11 +34,6 @@ replicaCount: 1
 
 updateStrategy:
   type: RollingUpdate
-
-## Annotations for server pods.
-## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
-##
-podAnnotations: {}
 
 ## Prometheus Metrics
 ##
@@ -26,7 +45,7 @@ metrics:
   podAnnotations:
     prometheus.io/scrape: "true"
 
-  endpointPath: /v1/idgenerator/actuator/prometheus
+  endpointPath: /api/g2p-bridge/metrics
 
   ## Prometheus Service Monitor
   ## ref: https://github.com/coreos/prometheus-operator
@@ -72,11 +91,6 @@ metrics:
     #     labels:
     #       severity: error
     rules: []
-
-## Pod extra labels
-## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
-##
-podLabels: {}
 
 ## Specifies whether a ServiceAccount should be created
 ##
@@ -326,7 +340,7 @@ istio:
     prefix: /api/g2p-bridge/
     rewriteUri: "/"
   gateway:
-    enabled: true
+    enabled: false
     host: ""
     ingressController:
       istio: ingressgateway
@@ -349,7 +363,6 @@ service:
   ##   http: <to set explicitly, choose port between 30000-32767>
   ##   https: <to set explicitly, choose port between 30000-32767>
   ##
-
   nodePorts:
     http: ""
     https: ""
@@ -357,20 +370,6 @@ service:
   ## ref http://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
   ##
   externalTrafficPolicy: Cluster
-
-## Add labels to all the deployed resources
-##
-commonLabels:
-  app.kubernetes.io/group: openg2p
-
-## Add annotations to all the deployed resources
-##
-commonAnnotations: {}
-
-hostname: g2p-bridge.dev.openg2p.org
-
-nameOverride: g2p-bridge
-fullnameOverride: g2p-bridge
 
 autoscaling:
   enabled: false
@@ -380,7 +379,7 @@ autoscaling:
   targetMemoryUtilizationPercentage: 80
 
 ingress:
-  enabled: true
+  enabled: false
   className: ""
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /$2
