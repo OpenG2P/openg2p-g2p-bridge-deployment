@@ -1,0 +1,121 @@
+{{/*
+Expand the name of the chart.
+*/}}
+{{- define "g2pBridge.name" -}}
+{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
+{{- end }}
+
+{{/*
+Create chart name and version as used by the chart label.
+*/}}
+{{- define "g2pBridge.chart" -}}
+{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
+{{- end }}
+
+
+
+{{/*
+Return podAnnotations
+*/}}
+{{- define "g2pBridge.podAnnotations" -}}
+{{- if .Values.podAnnotations }}
+{{ include "common.tplvalues.render" (dict "value" .Values.podAnnotations "context" $) }}
+{{- end }}
+{{- if and .Values.metrics.enabled .Values.metrics.podAnnotations }}
+{{ include "common.tplvalues.render" (dict "value" .Values.metrics.podAnnotations "context" $) }}
+{{- end }}
+{{- end -}}
+
+{{/*
+Create the name of the service account to use
+*/}}
+{{- define "g2pBridge.serviceAccountName" -}}
+{{- if .Values.serviceAccount.create -}}
+    {{ default (printf "%s" (include "common.names.fullname" .)) .Values.serviceAccount.name }}
+{{- else -}}
+    {{ default "default" .Values.serviceAccount.name }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Return the proper Docker Image Registry Secret Names
+*/}}
+{{- define "g2pBridge.imagePullSecrets" -}}
+{{- include "common.images.pullSecrets" (dict "images" (list .Values.image .Values.volumePermissions.image) "global" .Values.global) -}}
+{{- end -}}
+
+{{/*
+Return the proper  image name
+*/}}
+{{- define "g2pBridge.image" -}}
+{{ include "common.images.image" (dict "imageRoot" .Values.image "global" .Values.global) }}
+{{- end -}}
+
+{{/*
+Unified template to render environment variables with type checks and possible valueFrom rendering.
+*/}}
+{{- define "g2pBridge.envVars" -}}
+{{- $context := . -}}  # We directly use the root context since 'context' was previously just the root passed as 'context'.
+{{- $envVars := merge (deepCopy .Values.envVars) (deepCopy .Values.envVarsFrom) dict -}}  # Merging all environment variable definitions into a single map.
+{{- range $k, $v := $envVars }}
+- name: {{ $k }}
+  {{- if or (kindIs "int64" $v) (kindIs "float64" $v) (kindIs "bool" $v) }}
+  value: {{ $v | quote }}
+  {{- else if kindIs "string" $v }}
+  value: {{ include "common.tplvalues.render" (dict "value" $v "context" $context) | squote }}
+  {{- else }}
+  valueFrom:
+    {{- include "common.tplvalues.render" (dict "value" $v "context" $context) | nindent 4 }}
+  {{- end }}
+{{- end }}
+{{- end }}
+
+
+{{/*
+Create a default fully qualified app name.
+We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+If release name contains chart name it will be used as a full name.
+*/}}
+{{- define "g2pBridge.fullname" -}}
+{{- if .Values.fullnameOverride }}
+{{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
+{{- else }}
+{{- $name := default .Chart.Name .Values.nameOverride }}
+{{- if contains $name .Release.Name }}
+{{- .Release.Name | trunc 63 | trimSuffix "-" }}
+{{- else }}
+{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" }}
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{/*
+Common labels
+*/}}
+{{- define "g2pBridge.labels" -}}
+helm.sh/chart: {{ include "g2pBridge.chart" . }}
+{{ include "g2pBridge.selectorLabels" . }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+app.kubernetes.io/managed-by: {{ .Release.Servig2pBridge.chartce }}
+{{- end }}
+
+{{/*
+Selector labels
+*/}}
+{{- define "g2pBridge.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "g2pBridge.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}
+
+{{/*
+Create the name of the service account to use
+*/}}
+{{- define "g2pBridge.serviceAccountName" -}}
+{{- if .Values.serviceAccount.create -}}
+    {{ default (printf "%s" (include "common.names.fullname" .)) .Values.serviceAccount.name }}
+{{- else -}}
+    {{ default "default" .Values.serviceAccount.name }}
+{{- end -}}
+{{- end -}}
