@@ -1,0 +1,18 @@
+openg2p-g2p-bridge-api:
+  enabled: true
+  postgresql:
+    enabled: false
+
+openg2p-g2p-bridge-celery-beat-producers:
+  enabled: true
+
+postgresql:
+  enabled: true
+  auth:
+    username: bridgeuser
+    database: openg2p_g2p_bridge_db
+  primary:
+    extendedConfiguration: |-
+      wal_level = logical
+      max_wal_senders = 20
+      max_replication_slots = 10
