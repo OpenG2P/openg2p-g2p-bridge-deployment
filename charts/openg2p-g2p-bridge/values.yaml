@@ -1,0 +1,51 @@
+openg2p-g2p-bridge-api:
+  enabled: true
+  common:
+    enabled: false
+  postgresql:
+    enabled: false
+  envVars:
+    G2P_BRIDGE_DB_HOSTNAME: '{{ .Release.Name }}-postgresql'
+  envVarsFrom:
+    G2P_BRIDGE_DB_PASSWORD:
+      secretKeyRef:
+        name: '{{ .Release.Name }}-postgresql'
+        key: password
+
+openg2p-g2p-bridge-celery-beat-producers:
+  enabled: true
+  common:
+    enabled: false
+  postgresql:
+    enabled: false
+  redis:
+    enabled: false
+  envVars:
+    G2P_BRIDGE_CELERY_TASKS_MAPPER_RESOLVE_API_URL: 'http://mapper/sync/resolve'
+    G2P_BRIDGE_CELERY_TASKS_DB_HOSTNAME: '{{ .Release.Name }}-postgresql'
+    G2P_BRIDGE_CELERY_TASKS_CELERY_BROKER_URL: redis://{{ .Release.Name }}-redis-master:6379/0
+    G2P_BRIDGE_CELERY_TASKS_CELERY_BACKEND_URL: redis://{{ .Release.Name }}-redis-master:6379/0
+
+  envVarsFrom:
+    G2P_BRIDGE_CELERY_TASKS_DB_PASSWORD:
+      secretKeyRef:
+        name: '{{ .Release.Name }}-postgresql'
+        key: password
+
+postgresql:
+  enabled: true
+  auth:
+    username: bridgeuser
+    database: openg2p_g2p_bridge_db
+  primary:
+    extendedConfiguration: |-
+      wal_level = logical
+      max_wal_senders = 20
+      max_replication_slots = 10
+
+redis:
+  cluster:
+    enabled: false
+  replicaCount: 1
+  auth:
+    enabled: false

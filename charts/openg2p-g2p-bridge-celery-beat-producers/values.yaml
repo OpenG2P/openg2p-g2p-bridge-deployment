@@ -149,6 +149,40 @@ containerSecurityContext:
   runAsUser: 1001
   runAsNonRoot: true
 
+## Init containers parameters:
+## volumePermissions: Change the owner and group of the persistent volume mountpoint to runAsUser:fsGroup values from the securityContext section.
+##
+volumePermissions:
+  enabled: false
+  image:
+    registry: docker.io
+    repository: bitnami/bitnami-shell
+    tag: "10"
+    pullPolicy: Always
+    ## Optionally specify an array of imagePullSecrets.
+    ## Secrets must be manually created in the namespace.
+    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+    ##
+    pullSecrets: []
+    ##   - myRegistryKeySecretName
+  ## Init containers' resource requests and limits
+  ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+  ##
+  resources:
+    ## We usually recommend not to specify default resources and to leave this as a conscious
+    ## choice for the user. This also increases chances charts run on environments with little
+    ## resources, such as Minikube. If you do want to specify resources, uncomment the following
+    ## lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    ##
+    limits: {}
+    ##   cpu: 100m
+    ##   memory: 128Mi
+    ##
+    requests: {}
+    ##   cpu: 100m
+    ##   memory: 128Mi
+    ##
+
 envVars:
   G2P_BRIDGE_CELERY_TASKS_MAPPER_RESOLVE_API_URL: 'http://mapper/sync/resolve'
   G2P_BRIDGE_CELERY_TASKS_MAPPER_RESOLVE_RETRIES: 3
@@ -175,7 +209,7 @@ envVars:
   G2P_BRIDGE_CELERY_TASKS_FUNDS_DISBURSEMENT_ATTEMPTS: 3
   G2P_BRIDGE_CELERY_TASKS_STATEMENT_PROCESS_ATTEMPTS: 3
   G2P_BRIDGE_CELERY_TASKS_CELERY_BROKER_URL: redis://{{ include "common.names.fullname" .Subcharts.redis }}-master:6379/0
-  G2P_BRIDGE_CELERY_TASKS_CELERY_BACKEND_URL:  redis://{{ include "common.names.fullname" .Subcharts.redis }}-master:6379/0
+  G2P_BRIDGE_CELERY_TASKS_CELERY_BACKEND_URL: redis://{{ include "common.names.fullname" .Subcharts.redis }}-master:6379/0
 
 
 envVarsFrom:
