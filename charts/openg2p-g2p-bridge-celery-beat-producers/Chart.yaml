@@ -1,6 +1,6 @@
 apiVersion: v2
-name: openg2p-g2p-bridge-api
-description: A Helm chart for OpenG2P G2P Bridge API
+name: openg2p-g2p-bridge-celery-beat-producers
+description: A Helm chart for OpenG2P G2P Bridge Celery Beat Producers
 type: application
 version: 1.0.0
 appVersion: ""
@@ -17,10 +17,10 @@ dependencies:
   version: 20.x.x
   condition: redis.enabled
 keywords:
-  - openg2p-g2p-bridge-api
+  - openg2p-g2p-bridge-celery-beat-producers
 maintainers:
   - email: info@openg2p.org
     name: OpenG2P
 icon: https://openg2p.github.io/openg2p-helm/openg2p-logo.png
 annotations:
-  catalog.cattle.io/display-name: "OpenG2P-G2P-Bridge-API"
+  catalog.cattle.io/display-name: "OpenG2P-G2P-Bridge-Celery-Beat-Producers"
