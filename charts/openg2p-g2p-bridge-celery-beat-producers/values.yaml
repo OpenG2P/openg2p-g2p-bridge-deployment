@@ -184,36 +184,33 @@ volumePermissions:
     ##
 
 envVars:
-  G2P_BRIDGE_CELERY_TASKS_MAPPER_RESOLVE_API_URL: 'http://mapper/sync/resolve'
-  G2P_BRIDGE_CELERY_TASKS_MAPPER_RESOLVE_RETRIES: 3
-  G2P_BRIDGE_CELERY_TASKS_PORT: 8000
-  G2P_BRIDGE_CELERY_TASKS_DB_DBNAME: openg2p_g2p_bridge_db
-  G2P_BRIDGE_CELERY_TASKS_HOST: 0.0.0.0
-  G2P_BRIDGE_CELERY_TASKS_DB_PORT: 5432
-  G2P_BRIDGE_CELERY_TASKS_DB_USERNAME: bridgeuser
-  G2P_BRIDGE_CELERY_TASKS_DB_HOSTNAME: '{{ include "postgresql.v1.primary.fullname" .Subcharts.postgresql }}'
-  G2P_BRIDGE_CELERY_TASKS_BANK_FA_DECONSTRUCT_STRATEGY: ^account_number:(?P<account_number>.*)\.branch_code:(?P<branch_code>.*)\.bank_code:(?P<bank_code>.*)\.fa_type:(?P<fa_type>.*)$
-  G2P_BRIDGE_CELERY_TASKS_MOBILE_WALLET_DECONSTRUCT_STRATEGY: ^mobile_number:(?P<mobile_number>.*)\.wallet_provider_name:(?P<wallet_provider_name>.*)\.wallet_provider_code:(?P<wallet_provider_code>.*)\.fa_type:(?P<fa_type>.*)$
-  G2P_BRIDGE_CELERY_TASKS__EMAIL_WALLET_DECONSTRUCT_STRATEGY: ^email_address:(?P<email_address>.*)\.wallet_provider_name:(?P<wallet_provider_name>.*)\.wallet_provider_code:(?P<wallet_provider_code>.*)\.fa_type:(?P<fa_type>.*)$
-  G2P_BRIDGE_CELERY_PRODUCERS_FUNDS_AVAILABLE_CHECK_URL_EXAMPLE_BANK: http://127.0.0.1:8003/check_funds
-  G2P_BRIDGE_CELERY_PRODUCERS_FUNDS_BLOCK_URL_EXAMPLE_BANK: http://127.0.0.1:8003/block_funds
-  G2P_BRIDGE_CELERY_PRODUCERS_FUNDS_DISBURSEMENT_URL_EXAMPLE_BANK: http://127.0.0.1:8003/initiate_payment
-  G2P_BRIDGE_CELERY_TASKS_MAPPER_RESOLVE_FREQUENCY: 10
-  G2P_BRIDGE_CELERY_TASKS_FUNDS_AVAILABLE_CHECK_FREQUENCY: 10
-  G2P_BRIDGE_CELERY_TASKS_FUNDS_BLOCKED_FREQUENCY: 10
-  G2P_BRIDGE_CELERY_TASKS_FUNDS_DISBURSEMENT_FREQUENCY: 10
-  G2P_BRIDGE_CELERY_TASKS_MT940_PROCESSOR_FREQUENCY: 10
-  G2P_BRIDGE_CELERY_TASKS_MAPPER_RESOLVE_ATTEMPTS: 3
-  G2P_BRIDGE_CELERY_TASKS_FUNDS_AVAILABLE_CHECK_ATTEMPTS: 3
-  G2P_BRIDGE_CELERY_TASKS_FUNDS_BLOCKED_ATTEMPTS: 3
-  G2P_BRIDGE_CELERY_TASKS_FUNDS_DISBURSEMENT_ATTEMPTS: 3
-  G2P_BRIDGE_CELERY_TASKS_STATEMENT_PROCESS_ATTEMPTS: 3
-  G2P_BRIDGE_CELERY_TASKS_CELERY_BROKER_URL: redis://{{ include "common.names.fullname" .Subcharts.redis }}-master:6379/0
-  G2P_BRIDGE_CELERY_TASKS_CELERY_BACKEND_URL: redis://{{ include "common.names.fullname" .Subcharts.redis }}-master:6379/0
+  G2P_BRIDGE_CELERY_BEAT_MAPPER_RESOLVE_API_URL: 'http://mapper/sync/resolve'
+  G2P_BRIDGE_CELERY_BEAT_MAPPER_RESOLVE_RETRIES: 3
+  G2P_BRIDGE_CELERY_BEAT_PORT: 8000
+  G2P_BRIDGE_CELERY_BEAT_DB_DBNAME: openg2p_g2p_bridge_db
+  G2P_BRIDGE_CELERY_BEAT_HOST: 0.0.0.0
+  G2P_BRIDGE_CELERY_BEAT_DB_PORT: 5432
+  G2P_BRIDGE_CELERY_BEAT_DB_USERNAME: bridgeuser
+  G2P_BRIDGE_CELERY_BEAT_DB_HOSTNAME: '{{ include "postgresql.v1.primary.fullname" .Subcharts.postgresql }}'
+  G2P_BRIDGE_CELERY_BEAT_BANK_FA_DECONSTRUCT_STRATEGY: ^account_number:(?P<account_number>.*)\.branch_code:(?P<branch_code>.*)\.bank_code:(?P<bank_code>.*)\.fa_type:(?P<fa_type>.*)$
+  G2P_BRIDGE_CELERY_BEAT_MOBILE_WALLET_DECONSTRUCT_STRATEGY: ^mobile_number:(?P<mobile_number>.*)\.wallet_provider_name:(?P<wallet_provider_name>.*)\.wallet_provider_code:(?P<wallet_provider_code>.*)\.fa_type:(?P<fa_type>.*)$
+  G2P_BRIDGE_CELERY_BEAT_EMAIL_WALLET_DECONSTRUCT_STRATEGY: ^email_address:(?P<email_address>.*)\.wallet_provider_name:(?P<wallet_provider_name>.*)\.wallet_provider_code:(?P<wallet_provider_code>.*)\.fa_type:(?P<fa_type>.*)$
+  G2P_BRIDGE_CELERY_BEAT_MAPPER_RESOLVE_FREQUENCY: 60
+  G2P_BRIDGE_CELERY_BEAT_FUNDS_AVAILABLE_CHECK_FREQUENCY: 60
+  G2P_BRIDGE_CELERY_BEAT_FUNDS_BLOCKED_FREQUENCY: 60
+  G2P_BRIDGE_CELERY_BEAT_FUNDS_DISBURSEMENT_FREQUENCY: 60
+  G2P_BRIDGE_CELERY_BEAT_MT940_PROCESSOR_FREQUENCY: 60
+  G2P_BRIDGE_CELERY_BEAT_MAPPER_RESOLVE_ATTEMPTS: 3
+  G2P_BRIDGE_CELERY_BEAT_FUNDS_AVAILABLE_CHECK_ATTEMPTS: 3
+  G2P_BRIDGE_CELERY_BEAT_FUNDS_BLOCKED_ATTEMPTS: 3
+  G2P_BRIDGE_CELERY_BEAT_FUNDS_DISBURSEMENT_ATTEMPTS: 3
+  G2P_BRIDGE_CELERY_BEAT_STATEMENT_PROCESS_ATTEMPTS: 3
+  G2P_BRIDGE_CELERY_BEAT_CELERY_BROKER_URL: redis://{{ include "common.names.fullname" .Subcharts.redis }}-master:6379/0
+  G2P_BRIDGE_CELERY_BEAT_CELERY_BACKEND_URL: redis://{{ include "common.names.fullname" .Subcharts.redis }}-master:6379/0
 
 
 envVarsFrom:
-  G2P_BRIDGE_CELERY_TASKS_DB_PASSWORD:
+  G2P_BRIDGE_CELERY_BEAT_DB_PASSWORD:
     secretKeyRef:
       name: '{{ include "postgresql.v1.primary.fullname" .Subcharts.postgresql }}'
       key: password
@@ -297,7 +294,7 @@ postgresCheckerInit:
   command:
   - 'sh'
   - '-c'
-  - 'until pg_isready -U ${G2P_BRIDGE_CELERY_TASKS_DB_USERNAME} -h ${G2P_BRIDGE_CELERY_TASKS_DB_HOSTNAME} -p ${G2P_BRIDGE_CELERY_TASKS_DB_PORT:-5432} -d ${G2P_BRIDGE_CELERY_TASKS_DB_DBNAME:-bridgedb}; do sleep 3; done'
+  - 'until pg_isready -U ${G2P_BRIDGE_CELERY_BEAT_DB_USERNAME} -h ${G2P_BRIDGE_CELERY_BEAT_DB_HOSTNAME} -p ${G2P_BRIDGE_CELERY_BEAT_DB_PORT:-5432} -d ${G2P_BRIDGE_CELERY_BEAT_DB_DBNAME:-bridgedb}; do sleep 3; done'
 
 postgresql:
   enabled: true
