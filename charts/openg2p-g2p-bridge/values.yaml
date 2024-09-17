@@ -45,12 +45,12 @@ openg2p-g2p-bridge-celery-workers:
     G2P_BRIDGE_CELERY_WORKERS_DB_DBNAME: openg2p_g2p_bridge_db
     G2P_BRIDGE_CELERY_WORKERS_DB_USERNAME: bridgeuser
     G2P_BRIDGE_CELERY_WORKERS_DB_HOSTNAME: '{{ .Release.Name }}-postgresql'
-    G2P_BRIDGE_CELERY_WORKERS_BANK_FA_DECONSTRUCT_STRATEGY: ^account_number:(?P<account_number>\w+)\.branch_code:(?P<branch_code>\w+)\.bank_code:(?P<bank_code>\w+)\.fa_type:(?P<fa_type>[A-Z_]+)$
+    G2P_BRIDGE_CELERY_WORKERS_BANK_FA_DECONSTRUCT_STRATEGY: ^account_number:(?P<account_number>\w+)\.branch_code:(?P<branch_code>\w+)\.bank_code:(?P<bank_code>\w+)\.mobile_number:(?P<mobile_number>\w+)\.email_address:(?P<email_address>[\w.@]+)\.fa_type:(?P<fa_type>[A-Z_]+)$
     G2P_BRIDGE_CELERY_WORKERS_MOBILE_WALLET_DECONSTRUCT_STRATEGY: mobile_(?P<mobile_number>\d+)_(?P<mobile_wallet_provider>\w+)
     G2P_BRIDGE_CELERY_WORKERS_EMAIL_WALLET_DECONSTRUCT_STRATEGY: email_(?P<email_address>\w+)_(?P<email_wallet_provider>\w+)
-    G2P_BRIDGE_CELERY_WORKERS_FUNDS_AVAILABLE_CHECK_URL_EXAMPLE_BANK: 'http://openg2p-g2p-bridge-example-bank-api/check_funds'
-    G2P_BRIDGE_CELERY_WORKERS_FUNDS_BLOCK_URL_EXAMPLE_BANK: 'http://openg2p-g2p-bridge-example-bank-api/block_funds'
-    G2P_BRIDGE_CELERY_WORKERS_FUNDS_DISBURSEMENT_URL_EXAMPLE_BANK: 'http://openg2p-g2p-bridge-example-bank-api/initiate_payment'
+    G2P_BRIDGE_CELERY_PRODUCERS_FUNDS_AVAILABLE_CHECK_URL_EXAMPLE_BANK: 'http://openg2p-g2p-bridge-example-bank-api/check_funds'
+    G2P_BRIDGE_CELERY_PRODUCERS_FUNDS_BLOCK_URL_EXAMPLE_BANK: 'http://openg2p-g2p-bridge-example-bank-api/block_funds'
+    G2P_BRIDGE_CELERY_PRODUCERS_FUNDS_DISBURSEMENT_URL_EXAMPLE_BANK: 'http://openg2p-g2p-bridge-example-bank-api/initiate_payment'
     G2P_BRIDGE_CELERY_WORKERS_CELERY_BROKER_URL: redis://{{ .Release.Name }}-redis-master:6379/0
     G2P_BRIDGE_CELERY_WORKERS_CELERY_BACKEND_URL: redis://{{ .Release.Name }}-redis-master:6379/0
 
