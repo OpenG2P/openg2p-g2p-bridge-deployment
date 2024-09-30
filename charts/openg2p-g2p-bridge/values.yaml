@@ -2,7 +2,6 @@ global:
   g2pBridgeHostname: g2p-bridge.sandbox.openg2p.net
 
 openg2p-g2p-bridge-api:
-  hostname: g2p-bridge.sandbox.openg2p.net
   enabled: true
   common:
     enabled: false
