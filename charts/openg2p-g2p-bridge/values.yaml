@@ -1,3 +1,6 @@
+global:
+  g2pBridgeHostname: g2p-bridge.sandbox.openg2p.net
+
 openg2p-g2p-bridge-api:
   enabled: true
   common:
@@ -25,6 +28,11 @@ openg2p-g2p-bridge-celery-beat-producers:
     G2P_BRIDGE_CELERY_BEAT_DB_HOSTNAME: '{{ .Release.Name }}-postgresql'
     G2P_BRIDGE_CELERY_BEAT_CELERY_BROKER_URL: redis://{{ .Release.Name }}-redis-master:6379/0
     G2P_BRIDGE_CELERY_BEAT_CELERY_BACKEND_URL: redis://{{ .Release.Name }}-redis-master:6379/0
+    G2P_BRIDGE_CELERY_BEAT_MAPPER_RESOLVE_FREQUENCY: 10
+    G2P_BRIDGE_CELERY_BEAT_FUNDS_AVAILABLE_CHECK_FREQUENCY: 10
+    G2P_BRIDGE_CELERY_BEAT_FUNDS_BLOCKED_FREQUENCY: 10
+    G2P_BRIDGE_CELERY_BEAT_FUNDS_DISBURSEMENT_FREQUENCY: 10
+    G2P_BRIDGE_CELERY_BEAT_MT940_PROCESSOR_FREQUENCY: 10
 
   envVarsFrom:
     G2P_BRIDGE_CELERY_BEAT_DB_PASSWORD:

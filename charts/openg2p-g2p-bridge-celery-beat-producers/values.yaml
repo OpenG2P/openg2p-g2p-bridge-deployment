@@ -1,7 +1,7 @@
 global:
   g2pBridgeHostname: ''
 
-hostname: ''
+hostname: '{{ .Values.global.g2pBridgeHostname }}'
 nameOverride: g2p-bridge-celery-beat
 fullnameOverride: g2p-bridge-celery-beat
 
