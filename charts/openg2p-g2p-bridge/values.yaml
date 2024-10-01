@@ -3,6 +3,10 @@ global:
 
 openg2p-g2p-bridge-api:
   enabled: true
+  image:
+    registry: docker.io
+    repository: openg2p/openg2p-g2p-bridge-api
+    tag: develop
   common:
     enabled: false
   postgresql:
@@ -17,6 +21,10 @@ openg2p-g2p-bridge-api:
 
 openg2p-g2p-bridge-celery-beat-producers:
   enabled: true
+  image:
+    registry: docker.io
+    repository: openg2p/openg2p-g2p-bridge-celery-beat-producers
+    tag: develop
   common:
     enabled: false
   postgresql:
@@ -42,6 +50,10 @@ openg2p-g2p-bridge-celery-beat-producers:
 
 openg2p-g2p-bridge-celery-workers:
   enabled: true
+  image:
+    registry: docker.io
+    repository: openg2p/openg2p-g2p-bridge-celery-workers
+    tag: develop
   common:
     enabled: false
   postgresql:
