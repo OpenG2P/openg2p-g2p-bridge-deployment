@@ -1,0 +1,20 @@
+questions:
+- variable: global.g2pBridgeHostname
+  description: Hostname under which all Bridge services will be accessed
+  type: string
+  label: G2P Bridge Hostname
+
+- variable: openg2p-g2p-bridge-api.enabled
+  description: Install G2P Bridge API
+  type: boolean
+  label: G2P Bridge API
+
+- variable: openg2p-g2p-bridge-celery-beat-producers.enabled
+  description: Install G2P Bridge Celery Beat Producers
+  type: boolean
+  label: G2P Bridge Celery Beat Producers
+
+- variable: openg2p-g2p-bridge-celery-workers.enabled
+  description: Install G2P Bridge Celery Workers
+  type: boolean
+  label: G2P Bridge Celery Workers

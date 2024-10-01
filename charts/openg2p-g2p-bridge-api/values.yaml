@@ -1,7 +1,6 @@
 global:
-  g2pBridgeHostname: g2p-bridge.dev.openg2p.org
+  g2pBridgeHostname: g2p-bridge.sandbox.openg2p.net
 
-hostname: g2p-bridge.dev.openg2p.org
 nameOverride: openg2p-g2p-bridge-api
 fullnameOverride: openg2p-g2p-bridge-api
 

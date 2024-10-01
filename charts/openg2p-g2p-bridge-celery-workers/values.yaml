@@ -1,7 +1,6 @@
 global:
   g2pBridgeHostname: ''
 
-hostname: ''
 nameOverride: g2p-bridge-celery-workers
 fullnameOverride: g2p-bridge-celery-workers
 
