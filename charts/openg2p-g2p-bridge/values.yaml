@@ -99,6 +99,6 @@ redis:
   enabled: true
   cluster:
     enabled: false
-  replicaCount: 1
+  replicaCount: 0
   auth:
     enabled: false
