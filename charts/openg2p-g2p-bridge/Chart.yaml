@@ -18,13 +18,13 @@ dependencies:
   version: 20.x.x
   condition: redis.enabled
 - name: openg2p-g2p-bridge-api
-  version: 1.0.0
+  version: 1.0.2
   condition: openg2p-g2p-bridge-api.enabled
 - name: openg2p-g2p-bridge-celery-beat-producers
-  version: 1.0.0
+  version: 1.0.2
   condition: openg2p-g2p-bridge-celery-beat-producers.enabled
 - name: openg2p-g2p-bridge-celery-workers
-  version: 1.0.0
+  version: 1.0.2
   condition: openg2p-g2p-bridge-celery-workers.enabled
 keywords:
   - openg2p-g2p-bridge-api
