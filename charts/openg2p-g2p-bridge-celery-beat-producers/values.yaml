@@ -206,7 +206,7 @@ envVars:
   G2P_BRIDGE_CELERY_BEAT_STATEMENT_PROCESS_ATTEMPTS: 3
   G2P_BRIDGE_CELERY_BEAT_CELERY_BROKER_URL: redis://{{ include "common.names.fullname" .Subcharts.redis }}-master:6379/0
   G2P_BRIDGE_CELERY_BEAT_CELERY_BACKEND_URL: redis://{{ include "common.names.fullname" .Subcharts.redis }}-master:6379/0
-
+  G2P_BRIDGE_CELERY_BEAT_PROCESS_FUTURE_DISBURSEMENT_SCHEDULES: false
 
 envVarsFrom:
   G2P_BRIDGE_CELERY_BEAT_DB_PASSWORD:
