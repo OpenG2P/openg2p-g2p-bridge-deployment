@@ -1,5 +1,5 @@
 global:
-  g2pBridgeHostname: g2p-bridge.explore.openg2p.net
+  g2pBridgeHostname: g2p-bridge.explore.openg2p.org
 
 openg2p-g2p-bridge-api:
   enabled: true
@@ -86,6 +86,14 @@ openg2p-g2p-bridge-celery-workers:
 
 postgresql:
   enabled: true
+  resourcesPreset: "small"
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 500Mi
+    requests:
+      cpu: 200m
+      memory: 200Mi
   auth:
     username: bridgeuser
     database: openg2p_g2p_bridge_db
