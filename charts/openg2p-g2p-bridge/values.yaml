@@ -1,11 +1,10 @@
 global:
-  g2pBridgeHostname: g2p-bridge.explore.openg2p.org
+  g2pBridgeHostname: g2p-bridge.explore.openg2p.net
 
 openg2p-g2p-bridge-api:
   enabled: true
   image:
     registry: docker.io
-    repository: openg2p/openg2p-g2p-bridge-api
     tag: '1.0.2'
   common:
     enabled: false
