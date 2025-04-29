@@ -1,19 +1,11 @@
-global:
-  g2pBridgeHostname: ''
-
-nameOverride: g2p-bridge-celery-beat
-fullnameOverride: g2p-bridge-celery-beat
-
 ## Pod extra labels
 ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
 ##
-podLabels:
-  app.kubernetes.io/name: g2p-bridge-celery-beat
+podLabels: {}
 
 ## Add labels to all the deployed resources
 ##
-commonLabels:
-  app.kubernetes.io/group: openg2p-g2p-bridge
+commonLabels: {}
 
 ## Add annotations to all the deployed resources
 ##
@@ -38,16 +30,15 @@ updateStrategy:
 ## Specifies whether a ServiceAccount should be created
 ##
 serviceAccount:
-  create: true
+  create: false
   ## The name of the ServiceAccount to use.
   ## If not set and create is true, a name is generated using the fullname template
   ##
-  name: g2p-bridge-celery-beat
+  name: ""
 
 image:
-  registry: docker.io
   repository: openg2p/openg2p-g2p-bridge-celery-beat-producers
-  tag: 1.0.2
+  tag: "1.1"
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
   ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
@@ -148,75 +139,22 @@ containerSecurityContext:
   runAsUser: 1001
   runAsNonRoot: true
 
-## Init containers parameters:
-## volumePermissions: Change the owner and group of the persistent volume mountpoint to runAsUser:fsGroup values from the securityContext section.
-##
-volumePermissions:
-  enabled: false
-  image:
-    registry: docker.io
-    repository: bitnami/bitnami-shell
-    tag: "10"
-    pullPolicy: Always
-    ## Optionally specify an array of imagePullSecrets.
-    ## Secrets must be manually created in the namespace.
-    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
-    ##
-    pullSecrets: []
-    ##   - myRegistryKeySecretName
-  ## Init containers' resource requests and limits
-  ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
-  ##
-  resources:
-    ## We usually recommend not to specify default resources and to leave this as a conscious
-    ## choice for the user. This also increases chances charts run on environments with little
-    ## resources, such as Minikube. If you do want to specify resources, uncomment the following
-    ## lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-    ##
-    limits: {}
-    ##   cpu: 100m
-    ##   memory: 128Mi
-    ##
-    requests: {}
-    ##   cpu: 100m
-    ##   memory: 128Mi
-    ##
-
 envVars:
-  G2P_BRIDGE_CELERY_BEAT_MAPPER_RESOLVE_API_URL: 'http://mapper/sync/resolve'
-  G2P_BRIDGE_CELERY_BEAT_MAPPER_RESOLVE_RETRIES: 3
-  G2P_BRIDGE_CELERY_BEAT_PORT: 8000
   G2P_BRIDGE_CELERY_BEAT_DB_DBNAME: openg2p_g2p_bridge_db
-  G2P_BRIDGE_CELERY_BEAT_HOST: 0.0.0.0
   G2P_BRIDGE_CELERY_BEAT_DB_PORT: 5432
   G2P_BRIDGE_CELERY_BEAT_DB_USERNAME: bridgeuser
-  G2P_BRIDGE_CELERY_BEAT_DB_HOSTNAME: '{{ include "postgresql.v1.primary.fullname" .Subcharts.postgresql }}'
-  G2P_BRIDGE_CELERY_BEAT_BANK_FA_DECONSTRUCT_STRATEGY: ^account_number:(?P<account_number>.*)\.branch_code:(?P<branch_code>.*)\.bank_code:(?P<bank_code>.*)\.fa_type:(?P<fa_type>.*)$
-  G2P_BRIDGE_CELERY_BEAT_MOBILE_WALLET_DECONSTRUCT_STRATEGY: ^mobile_number:(?P<mobile_number>.*)\.wallet_provider_name:(?P<wallet_provider_name>.*)\.wallet_provider_code:(?P<wallet_provider_code>.*)\.fa_type:(?P<fa_type>.*)$
-  G2P_BRIDGE_CELERY_BEAT_EMAIL_WALLET_DECONSTRUCT_STRATEGY: ^email_address:(?P<email_address>.*)\.wallet_provider_name:(?P<wallet_provider_name>.*)\.wallet_provider_code:(?P<wallet_provider_code>.*)\.fa_type:(?P<fa_type>.*)$
-  G2P_BRIDGE_CELERY_BEAT_MAPPER_RESOLVE_FREQUENCY: 60
-  G2P_BRIDGE_CELERY_BEAT_FUNDS_AVAILABLE_CHECK_FREQUENCY: 60
-  G2P_BRIDGE_CELERY_BEAT_FUNDS_BLOCKED_FREQUENCY: 60
-  G2P_BRIDGE_CELERY_BEAT_FUNDS_DISBURSEMENT_FREQUENCY: 60
-  G2P_BRIDGE_CELERY_BEAT_MT940_PROCESSOR_FREQUENCY: 60
-  G2P_BRIDGE_CELERY_BEAT_MAPPER_RESOLVE_ATTEMPTS: 3
-  G2P_BRIDGE_CELERY_BEAT_FUNDS_AVAILABLE_CHECK_ATTEMPTS: 3
-  G2P_BRIDGE_CELERY_BEAT_FUNDS_BLOCKED_ATTEMPTS: 3
-  G2P_BRIDGE_CELERY_BEAT_FUNDS_DISBURSEMENT_ATTEMPTS: 3
-  G2P_BRIDGE_CELERY_BEAT_STATEMENT_PROCESS_ATTEMPTS: 3
-  G2P_BRIDGE_CELERY_BEAT_CELERY_BROKER_URL: redis://{{ include "common.names.fullname" .Subcharts.redis }}-master:6379/0
-  G2P_BRIDGE_CELERY_BEAT_CELERY_BACKEND_URL: redis://{{ include "common.names.fullname" .Subcharts.redis }}-master:6379/0
-  G2P_BRIDGE_CELERY_BEAT_PROCESS_FUTURE_DISBURSEMENT_SCHEDULES: false
+  G2P_BRIDGE_CELERY_BEAT_DB_HOSTNAME: '{{ tpl .Values.postgresqlInstallationName $ }}'
+
+  G2P_BRIDGE_CELERY_BEAT_CELERY_BROKER_URL: redis://{{ tpl .Values.redisInstallationName $ }}:6379/0
+  G2P_BRIDGE_CELERY_BEAT_CELERY_BACKEND_URL: redis://{{ tpl .Values.redisInstallationName $ }}:6379/0
 
 envVarsFrom:
   G2P_BRIDGE_CELERY_BEAT_DB_PASSWORD:
     secretKeyRef:
-      name: '{{ include "postgresql.v1.primary.fullname" .Subcharts.postgresql }}'
+      name: '{{ tpl .Values.postgresqlInstallationName $ }}'
       key: password
 
-g2pBridgeAPIPort: ""
-
-## ref: http://kubernetes.io/docs/user-guide/compute-postgresqlInstallationNameresources/
+## ref: http://kubernetes.io/docs/user-guide/compute-resources/
 ##
 ## We usually recommend not to specify default resources and to leave this as a conscious
 ## choice for the user. This also increases chances charts run on environments with little
@@ -235,10 +173,10 @@ resources: {}
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
 ##
 startupProbe:
-  enabled: true
+  enabled: false
   httpGet:
     path: /ping
-    port: 8000
+    port: http
   initialDelaySeconds: 0
   periodSeconds: 10
   timeoutSeconds: 5
@@ -246,10 +184,10 @@ startupProbe:
   successThreshold: 1
 
 livenessProbe:
-  enabled: true
+  enabled: false
   httpGet:
     path: /ping
-    port: 8000
+    port: http
   initialDelaySeconds: 20
   periodSeconds: 30
   timeoutSeconds: 5
@@ -257,23 +195,15 @@ livenessProbe:
   successThreshold: 1
 
 readinessProbe:
-  enabled: true
+  enabled: false
   httpGet:
     path: /ping
-    port: 8000
+    port: http
   initialDelaySeconds: 0
   periodSeconds: 10
   timeoutSeconds: 5
   failureThreshold: 6
   successThreshold: 1
-
-## Custom Rediness probes
-##
-customReadinessProbe: {}
-
-## Custom Liveness probes for
-##
-customLivenessProbe: {}
 
 ## Add sidecars to the  pods.
 ## Example:
@@ -289,26 +219,16 @@ sidecars: []
 
 postgresCheckerInit:
   enabled: true
-  image: jbergknoff/postgresql-client
+  image:
+    repository: jbergknoff/postgresql-client
+    tag: latest
+    pullPolicy: IfNotPresent
+    # pullSecrets:
+    #   - myRegistryKeySecretName
   command:
   - 'sh'
   - '-c'
-  - 'until pg_isready -U ${G2P_BRIDGE_CELERY_BEAT_DB_USERNAME} -h ${G2P_BRIDGE_CELERY_BEAT_DB_HOSTNAME} -p ${G2P_BRIDGE_CELERY_BEAT_DB_PORT:-5432} -d ${G2P_BRIDGE_CELERY_BEAT_DB_DBNAME:-bridgedb}; do sleep 3; done'
+  - 'until pg_isready -U ${G2P_BRIDGE_DB_USERNAME} -h ${G2P_BRIDGE_DB_HOSTNAME} -p ${G2P_BRIDGE_DB_PORT:-5432} -d ${G2P_BRIDGE_DB_DBNAME:-bridgedb}; do sleep 3; done'
 
-postgresql:
-  enabled: true
-  auth:
-    username: bridgeuser
-    database: openg2p_g2p_bridge_db
-  primary:
-    extendedConfiguration: |-
-      wal_level = logical
-      max_wal_senders = 20
-      max_replication_slots = 10
-
-redis:
-  cluster:
-    enabled: false
-  replicaCount: 1
-  auth:
-    enabled: false
+postgresqlInstallationName: '{{ .Release.Name }}-postgresql'
+redisInstallationName: '{{ .Release.Name }}-redis-master'

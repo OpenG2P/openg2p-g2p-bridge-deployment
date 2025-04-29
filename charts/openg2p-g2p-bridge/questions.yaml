@@ -18,3 +18,80 @@ questions:
   description: Install G2P Bridge Celery Workers
   type: boolean
   label: G2P Bridge Celery Workers
+
+- variable: openg2p-g2p-bridge-celery-workers.envVars.G2P_BRIDGE_CELERY_WORKERS_MAPPER_RESOLVE_API_URL
+  description: URL to reach resolve API SPAR Mapper
+  type: string
+  label: Mapper Resolve API URL
+
+- variable: global.g2pBridgeExampleBankBaseUrl
+  type: string
+  label: Bank APIs Base URL
+
+# Keymanager
+- variable: keymanager.enabled
+  description: This installs Keymanager for managing Keys for Encrpytion and Signatures
+  type: boolean
+  label: Install Keymanager?
+  group: Keymanager Settings
+
+- variable: odoo.keymanagerInstallationName
+  description: |-
+    Edit this only if you want to reuse existing Keymanager Installation.
+    Else enable Keymanager Installation from "General Settings".
+  type: reference_service
+  label: Existing Keymanager Installation Name
+  group: Keymanager Settings
+  show_if: "keymanager.enabled=false"
+
+- variable: keymanager.springConfig.profile
+  type: string
+  label: Spring Config Profile
+  group: Keymanager Settings
+  show_if: "keymanager.enabled=true"
+
+- variable: keymanager.springConfig.names
+  type: string
+  label: Spring Config Names
+  group: Keymanager Settings
+  show_if: "keymanager.enabled=true"
+
+- variable: keymanager.springConfig.gitRepo.enabled
+  description: Enables download of configs from Git repo.
+  type: boolean
+  label: Spring Config Git Enabled
+  group: Keymanager Settings
+  show_if: "keymanager.enabled=true"
+  show_subquestion_if: true
+  subquestions:
+  - variable: keymanager.springConfig.gitRepo.repoUrl
+    description: |-
+      Repo Url for remote Git repo containing configs.
+      This url should include username password if required.
+    type: string
+    label: Spring Config Git Repo Url
+    group: Keymanager Settings
+
+  - variable: keymanager.springConfig.gitRepo.branch
+    description: Branch of remote Git repo containing configs.
+    type: string
+    label: Spring Config Git Repo Branch
+    group: Keymanager Settings
+
+- variable: keymanager.springConfig.rawConfig
+  description: |-
+    If git-based config is disabled, the complete application.properties can be
+    directly supplied here.
+  type: multiline
+  label: Spring Config application properties.
+  group: Keymanager Settings
+  show_if: "keymanager.enabled=true&&keymanager.springConfig.gitRepo.enabled=false"
+
+- variable: keymanager.envVars.auth_server_admin_allowed_audience
+  description: |-
+    List of Keycloak Client ID allowed to call this keymanager's APIs.
+    Do not edit this parameter unless required.
+  type: string
+  label: Allowed Keycloak Client IDs.
+  group: Keymanager Settings
+  show_if: "keymanager.enabled=true"

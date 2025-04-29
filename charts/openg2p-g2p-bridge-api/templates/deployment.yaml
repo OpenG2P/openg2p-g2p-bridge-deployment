@@ -1,7 +1,7 @@
 apiVersion: {{ include "common.capabilities.deployment.apiVersion" . }}
 kind: Deployment
 metadata:
-  name: {{ template "common.names.fullname" . }}
+  name: {{ include "common.names.fullname" . }}
   labels: {{- include "common.labels.standard" (dict "customLabels" .Values.commonLabels "context" $) | nindent 4 }}
   {{- if .Values.commonAnnotations }}
   annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
@@ -9,20 +9,19 @@ metadata:
 spec:
   replicas: {{ .Values.replicaCount }}
   {{- if .Values.updateStrategy }}
-  strategy: {{- toYaml .Values.updateStrategy | nindent 4 }}
+  strategy: {{- include "common.tplvalues.render" (dict "value" .Values.updateStrategy "context" $) | nindent 4 }}
   {{- end }}
-
   selector:
-    matchLabels: {{- include "common.labels.matchLabels" . | nindent 6 }}
+    matchLabels: {{- include "common.labels.matchLabels" (dict "customLabels" .Values.podLabels "context" $) | nindent 6 }}
   template:
     metadata:
-      {{- if or .Values.podAnnotations .Values.metrics.enabled }}
-      annotations: {{- include "g2p-bridge.podAnnotations" . | nindent 8 }}
-      {{- end }}
       labels: {{- include "common.labels.standard" (dict "customLabels" .Values.podLabels "context" $) | nindent 8 }}
+      {{- if .Values.podAnnotations }}
+      annotations: {{- include "common.tplvalues.render" (dict "value" .Values.podAnnotations "context" $) | nindent 8 }}
+      {{- end }}
     spec:
-      serviceAccountName: {{ template "g2p-bridge.serviceAccountName" . }}
-      {{- include "g2p-bridge.imagePullSecrets" . | nindent 6 }}
+      serviceAccountName: {{ include "g2pBridgeApi.serviceAccountName" . }}
+      {{- include "g2pBridgeApi.imagePullSecrets" . | nindent 6 }}
       {{- if .Values.hostAliases }}
       hostAliases: {{- include "common.tplvalues.render" (dict "value" .Values.hostAliases "context" $) | nindent 8 }}
       {{- end }}
@@ -38,54 +37,47 @@ spec:
       nodeSelector: {{- include "common.tplvalues.render" ( dict "value" .Values.nodeSelector "context" $) | nindent 8 }}
       {{- end }}
       {{- if .Values.tolerations }}
-      tolerations: {{- include "common.tplvalues.render" (dict "value" .Values.tolerations "context" .) | nindent 8 }}
+      tolerations: {{- include "common.tplvalues.render" (dict "value" .Values.tolerations "context" $) | nindent 8 }}
       {{- end }}
       {{- if .Values.priorityClassName }}
       priorityClassName: {{ .Values.priorityClassName | quote }}
       {{- end }}
       {{- if .Values.podSecurityContext.enabled }}
-      securityContext: {{- omit .Values.podSecurityContext "enabled" | toYaml | nindent 8 }}
+      securityContext: {{- include "common.tplvalues.render" (dict "value" (omit .Values.podSecurityContext "enabled") "context" $) | nindent 8 }}
       {{- end }}
       initContainers:
-      {{- if .Values.postgresCheckerInit.enabled }}
-      - name: postgres-checker
-        image: {{ .Values.postgresCheckerInit.image }}
-        command:
-          {{- toYaml .Values.postgresCheckerInit.command | nindent 12 }}
-        env: {{- include "g2p-bridge.envVars" . | nindent 12 }}
-      {{- end }}
+        {{- if .Values.postgresCheckerInit.enabled }}
+        - name: postgres-checker
+          image: {{ include "common.images.image" (dict "imageRoot" .Values.postgresCheckerInit.image "global" .Values.global) }}
+          imagePullPolicy: {{ .Values.postgresCheckerInit.image.pullPolicy }}
+          command: {{- include "common.tplvalues.render" (dict "value" .Values.postgresCheckerInit.command "context" $) | nindent 12 }}
+          env: {{- include "g2pBridgeApi.envVars" . | indent 12 }}
+        {{- end }}
       containers:
-        - name: g2p-bridge
-          image: {{ template "g2p-bridge.image" . }}
+        - name: g2p-bridge-api
+          image: {{ include "common.images.image" (dict "imageRoot" .Values.image "global" .Values.global) }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           {{- if .Values.lifecycleHooks }}
           lifecycle: {{- include "common.tplvalues.render" (dict "value" .Values.lifecycleHooks "context" $) | nindent 12 }}
           {{- end }}
           {{- if .Values.containerSecurityContext.enabled }}
-          securityContext: {{- omit .Values.containerSecurityContext "enabled" | toYaml | nindent 12 }}
+          securityContext: {{- include "common.tplvalues.render" (dict "value" (omit .Values.containerSecurityContext "enabled") "context" $) | nindent 12 }}
           {{- end }}
-          env:
-            {{- include "g2p-bridge.envVars" . | nindent 12 }}
+          env: {{- include "g2pBridgeApi.envVars" . | indent 12 }}
           ports:
-            - name: g2p-bridge-api
-              containerPort: {{ .Values.g2pBridgeAPIPort }}
+            - name: http
+              containerPort: {{ .Values.containerPort }}
           {{- if .Values.resources }}
-          resources: {{- toYaml .Values.resources | nindent 12 }}
+          resources: {{- include "common.tplvalues.render" (dict "value" .Values.resources "context" $) | nindent 12 }}
           {{- end }}
           {{- if .Values.startupProbe.enabled }}
           startupProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.startupProbe "enabled") "context" $) | nindent 12 }}
-          {{- else if .Values.customStartupProbe }}
-          startupProbe: {{- include "common.tplvalues.render" (dict "value" .Values.customStartupProbe "context" $) | nindent 12 }}
           {{- end }}
           {{- if .Values.livenessProbe.enabled }}
           livenessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.livenessProbe "enabled") "context" $) | nindent 12 }}
-          {{- else if .Values.customLivenessProbe }}
-          livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.customLivenessProbe "context" $) | nindent 12 }}
           {{- end }}
           {{- if .Values.readinessProbe.enabled }}
           readinessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.readinessProbe "enabled") "context" $) | nindent 12 }}
-          {{- else if .Values.customReadinessProbe }}
-          readinessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.customReadinessProbe "context" $) | nindent 12 }}
           {{- end }}
         {{- if .Values.sidecars }}
         {{- include "common.tplvalues.render" ( dict "value" .Values.sidecars "context" $) | nindent 8 }}

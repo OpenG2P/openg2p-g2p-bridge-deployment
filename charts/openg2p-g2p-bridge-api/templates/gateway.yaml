@@ -9,8 +9,7 @@ metadata:
   annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
   {{- end }}
 spec:
-  selector:
-    {{ toYaml .Values.istio.gateway.ingressController | nindent 4 }}
+  selector: {{- include "common.tplvalues.render" ( dict "value" .Values.istio.gateway.ingressController "context" $) | nindent 4 }}
   servers:
   {{- if .Values.istio.gateway.httpEnabled }}
   - port:
@@ -31,8 +30,7 @@ spec:
       protocol: HTTPS
     hosts:
       - {{ default .Values.global.g2pBridgeHostname .Values.istio.gateway.host | quote }}
-    tls:
-      {{ toYaml (omit .Values.istio.gateway.tls "enabled") | nindent 6 }}
+    tls: {{- include "common.tplvalues.render" (dict "value" (omit .Values.istio.gateway.tls "enabled") "context" $) | nindent 6 }}
   {{- end }}
 {{- end }}
 {{- end }}

@@ -1,19 +1,11 @@
-global:
-  g2pBridgeHostname: ''
-
-nameOverride: g2p-bridge-celery-workers
-fullnameOverride: g2p-bridge-celery-workers
-
 ## Pod extra labels
 ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
 ##
-podLabels:
-  app.kubernetes.io/name: g2p-bridge-celery-workers
+podLabels: {}
 
 ## Add labels to all the deployed resources
 ##
-commonLabels:
-  app.kubernetes.io/group: openg2p-g2p-bridge
+commonLabels: {}
 
 ## Add annotations to all the deployed resources
 ##
@@ -38,16 +30,15 @@ updateStrategy:
 ## Specifies whether a ServiceAccount should be created
 ##
 serviceAccount:
-  create: true
+  create: false
   ## The name of the ServiceAccount to use.
   ## If not set and create is true, a name is generated using the fullname template
   ##
-  name: g2p-bridge-celery-workers
+  name: ""
 
 image:
-  registry: docker.io
   repository: openg2p/openg2p-g2p-bridge-celery-workers
-  tag: 1.0.2
+  tag: "1.1"
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
   ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
@@ -148,65 +139,24 @@ containerSecurityContext:
   runAsUser: 1001
   runAsNonRoot: true
 
-## Init containers parameters:
-## volumePermissions: Change the owner and group of the persistent volume mountpoint to runAsUser:fsGroup values from the securityContext section.
-##
-volumePermissions:
-  enabled: false
-  image:
-    registry: docker.io
-    repository: bitnami/bitnami-shell
-    tag: "10"
-    pullPolicy: Always
-    ## Optionally specify an array of imagePullSecrets.
-    ## Secrets must be manually created in the namespace.
-    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
-    ##
-    pullSecrets: []
-    ##   - myRegistryKeySecretName
-  ## Init containers' resource requests and limits
-  ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
-  ##
-  resources:
-    ## We usually recommend not to specify default resources and to leave this as a conscious
-    ## choice for the user. This also increases chances charts run on environments with little
-    ## resources, such as Minikube. If you do want to specify resources, uncomment the following
-    ## lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-    ##
-    limits: {}
-    ##   cpu: 100m
-    ##   memory: 128Mi
-    ##
-    requests: {}
-    ##   cpu: 100m
-    ##   memory: 128Mi
-    ##
-
 envVars:
-  G2P_BRIDGE_CELERY_WORKERS_MAPPER_RESOLVE_API_URL: 'http://mapper/sync/resolve'
-  G2P_BRIDGE_CELERY_WORKERS_MAPPER_RESOLVE_RETRY_DELAY: 5
   G2P_BRIDGE_CELERY_WORKERS_DB_DBNAME: openg2p_g2p_bridge_db
+  G2P_BRIDGE_CELERY_WORKERS_DB_PORT: 5432
   G2P_BRIDGE_CELERY_WORKERS_DB_USERNAME: bridgeuser
-  G2P_BRIDGE_CELERY_WORKERS_DB_HOSTNAME: '{{ include "postgresql.v1.primary.fullname" .Subcharts.postgresql }}'
-  G2P_BRIDGE_CELERY_WORKERS_BANK_FA_DECONSTRUCT_STRATEGY: bank_(?P<account_number>\d+)_(?P<bank_code>\d+)_(?P<branch_code>\d+)_(?P<account_type>\w+)
-  G2P_BRIDGE_CELERY_WORKERS_MOBILE_WALLET_DECONSTRUCT_STRATEGY: mobile_(?P<mobile_number>\d+)_(?P<mobile_wallet_provider>\w+)
-  G2P_BRIDGE_CELERY_WORKERS_EMAIL_WALLET_DECONSTRUCT_STRATEGY: email_(?P<email_address>\w+)_(?P<email_wallet_provider>\w+)
-  G2P_BRIDGE_CELERY_PRODUCERS_FUNDS_AVAILABLE_CHECK_URL_EXAMPLE_BANK: http://127.0.0.1:8003/check_funds"
-  G2P_BRIDGE_CELERY_PRODUCERS_FUNDS_BLOCK_URL_EXAMPLE_BANK: http://127.0.0.1:8003/block_funds"
-  G2P_BRIDGE_CELERY_PRODUCERS_FUNDS_DISBURSEMENT_URL_EXAMPLE_BANK: http://127.0.0.1:8003/initiate_payment"
-  G2P_BRIDGE_CELERY_WORKERS_CELERY_BROKER_URL: redis://{{ include "common.names.fullname" .Subcharts.redis }}-master:6379/0
-  G2P_BRIDGE_CELERY_WORKERS_CELERY_BACKEND_URL: redis://{{ include "common.names.fullname" .Subcharts.redis }}-master:6379/0
+  G2P_BRIDGE_CELERY_WORKERS_DB_HOSTNAME: '{{ tpl .Values.postgresqlInstallationName $ }}'
 
+  G2P_BRIDGE_CELERY_WORKERS_CELERY_BROKER_URL: redis://{{ tpl .Values.redisInstallationName $ }}:6379/0
+  G2P_BRIDGE_CELERY_WORKERS_CELERY_BACKEND_URL: redis://{{ tpl .Values.redisInstallationName $ }}:6379/0
+
+  G2P_BRIDGE_CELERY_WORKERS_MAPPER_RESOLVE_API_URL: 'http://mapper/sync/resolve'
 
 envVarsFrom:
   G2P_BRIDGE_CELERY_WORKERS_DB_PASSWORD:
     secretKeyRef:
-      name: '{{ include "postgresql.v1.primary.fullname" .Subcharts.postgresql }}'
+      name: '{{ tpl .Values.postgresqlInstallationName $ }}'
       key: password
 
-g2pBridgeAPIPort: ""
-
-## ref: http://kubernetes.io/docs/user-guide/compute-postgresqlInstallationNameresources/
+## ref: http://kubernetes.io/docs/user-guide/compute-resources/
 ##
 ## We usually recommend not to specify default resources and to leave this as a conscious
 ## choice for the user. This also increases chances charts run on environments with little
@@ -225,10 +175,10 @@ resources: {}
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
 ##
 startupProbe:
-  enabled: true
+  enabled: false
   httpGet:
     path: /ping
-    port: 8000
+    port: http
   initialDelaySeconds: 0
   periodSeconds: 10
   timeoutSeconds: 5
@@ -236,10 +186,10 @@ startupProbe:
   successThreshold: 1
 
 livenessProbe:
-  enabled: true
+  enabled: false
   httpGet:
     path: /ping
-    port: 8000
+    port: http
   initialDelaySeconds: 20
   periodSeconds: 30
   timeoutSeconds: 5
@@ -247,23 +197,15 @@ livenessProbe:
   successThreshold: 1
 
 readinessProbe:
-  enabled: true
+  enabled: false
   httpGet:
     path: /ping
-    port: 8000
+    port: http
   initialDelaySeconds: 0
   periodSeconds: 10
   timeoutSeconds: 5
   failureThreshold: 6
   successThreshold: 1
-
-## Custom Rediness probes
-##
-customReadinessProbe: {}
-
-## Custom Liveness probes for
-##
-customLivenessProbe: {}
 
 ## Add sidecars to the  pods.
 ## Example:
@@ -279,34 +221,16 @@ sidecars: []
 
 postgresCheckerInit:
   enabled: true
-  image: jbergknoff/postgresql-client
+  image:
+    repository: jbergknoff/postgresql-client
+    tag: latest
+    pullPolicy: IfNotPresent
+    # pullSecrets:
+    #   - myRegistryKeySecretName
   command:
   - 'sh'
   - '-c'
-  - |
-    until pg_isready \
-      -U "${G2P_BRIDGE_CELERY_WORKERS_DB_USERNAME}" \
-      -h "${G2P_BRIDGE_CELERY_WORKERS_DB_HOSTNAME}" \
-      -p "${G2P_BRIDGE_CELERY_WORKERS_DB_PORT:-5432}" \
-      -d "${G2P_BRIDGE_CELERY_WORKERS_DB_DBNAME:-bridgedb}"; do
-      sleep 3;
-    done
+  - 'until pg_isready -U ${G2P_BRIDGE_DB_USERNAME} -h ${G2P_BRIDGE_DB_HOSTNAME} -p ${G2P_BRIDGE_DB_PORT:-5432} -d ${G2P_BRIDGE_DB_DBNAME:-bridgedb}; do sleep 3; done'
 
-
-postgresql:
-  enabled: true
-  auth:
-    username: bridgeuser
-    database: openg2p_g2p_bridge_db
-  primary:
-    extendedConfiguration: |-
-      wal_level = logical
-      max_wal_senders = 20
-      max_replication_slots = 10
-
-redis:
-  cluster:
-    enabled: false
-  replicaCount: 1
-  auth:
-    enabled: false
+postgresqlInstallationName: '{{ include "common.names.fullname" . }}-postgresql'
+redisInstallationName: '{{ include "common.names.fullname" . }}-redis-master'
