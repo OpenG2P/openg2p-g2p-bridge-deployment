@@ -19,6 +19,21 @@ questions:
   type: boolean
   label: G2P Bridge Celery Workers
 
+- variable: global.keycloakBaseUrl
+  description: Keycloak Base Url used in all components
+  type: string
+  label: Keycloak Base URL
+
+- variable: global.g2pBridgeClientId
+  description: OIDC Client ID for G2P Bridge
+  type: string
+  label: OIDC Client ID
+
+- variable: global.g2pBridgeClientSecret
+  description: OIDC Client Secret for G2P Bridge
+  type: string
+  label: OIDC Client Secret
+
 - variable: openg2p-g2p-bridge-celery-workers.envVars.G2P_BRIDGE_CELERY_WORKERS_MAPPER_RESOLVE_API_URL
   description: URL to reach resolve API SPAR Mapper
   type: string
