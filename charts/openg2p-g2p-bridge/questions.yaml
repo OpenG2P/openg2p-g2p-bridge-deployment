@@ -50,15 +50,6 @@ questions:
   label: Install Keymanager?
   group: Keymanager Settings
 
-- variable: odoo.keymanagerInstallationName
-  description: |-
-    Edit this only if you want to reuse existing Keymanager Installation.
-    Else enable Keymanager Installation from "General Settings".
-  type: reference_service
-  label: Existing Keymanager Installation Name
-  group: Keymanager Settings
-  show_if: "keymanager.enabled=false"
-
 - variable: keymanager.springConfig.profile
   type: string
   label: Spring Config Profile
