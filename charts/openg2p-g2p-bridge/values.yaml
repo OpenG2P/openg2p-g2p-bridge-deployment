@@ -4,7 +4,8 @@ global:
 openg2p-g2p-bridge-api:
   enabled: true
   image:
-    tag: '1.0.2'
+    repository: openg2p/openg2p-g2p-bridge-api
+    tag: '1.1.0'
   common:
     enabled: false
   postgresql:
@@ -21,7 +22,7 @@ openg2p-g2p-bridge-celery-beat-producers:
   enabled: true
   image:
     repository: openg2p/openg2p-g2p-bridge-celery-beat-producers
-    tag: '1.0.2'
+    tag: '1.1.0'
   common:
     enabled: false
   postgresql:
@@ -53,7 +54,7 @@ openg2p-g2p-bridge-celery-workers:
   enabled: true
   image:
     repository: openg2p/openg2p-g2p-bridge-celery-workers
-    tag: '1.0.2'
+    tag: '1.1.0'
   common:
     enabled: false
   postgresql:
@@ -82,14 +83,6 @@ openg2p-g2p-bridge-celery-workers:
 
 postgresql:
   enabled: true
-  resourcesPreset: "small"
-  resources:
-    limits:
-      cpu: 1000m
-      memory: 500Mi
-    requests:
-      cpu: 200m
-      memory: 200Mi
   auth:
     username: bridgeuser
     database: openg2p_g2p_bridge_db
