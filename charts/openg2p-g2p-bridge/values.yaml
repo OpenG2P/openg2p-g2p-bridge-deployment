@@ -1,5 +1,5 @@
 global:
-  g2pBridgeHostname: g2p-bridge.sandbox.openg2p.net
+  g2pBridgeHostname: g2p-bridge.openg2p.sandbox.net
 
   g2pBridgeExampleBankBaseUrl: http://openg2p-g2p-bridge-example-bank-api
 
@@ -9,6 +9,9 @@ global:
   g2pBridgeClientId: 'openg2p-g2p-bridge-{{ .Release.Namespace }}'
   g2pBridgeClientSecret: ''
 
+  keymanagerAuthEnabled: false
+  keymanagerG2pBridgeAppId: OPENG2P_G2P_BRIDGE
+
 openg2p-g2p-bridge-api:
   enabled: true
   nameOverride: api
@@ -16,7 +19,10 @@ openg2p-g2p-bridge-api:
   keymanagerInstallationName: '{{ .Release.Name }}-keymanager'
 
   envVars:
+    G2P_BRIDGE_JWT_VALIDATE_KEYMANAGER_APP_ID: '{{ tpl .Values.global.keymanagerG2pBridgeAppId $ }}'
+
     G2P_BRIDGE_KEYMANAGER_API_BASE_URL: "http://{{ tpl .Values.keymanagerInstallationName $ }}/v1/keymanager"
+    G2P_BRIDGE_KEYMANAGER_AUTH_ENABLED: '{{ .Values.global.keymanagerAuthEnabled }}'
     G2P_BRIDGE_KEYMANAGER_AUTH_URL: "{{ tpl .Values.global.keycloakIssuerUrl $ }}/protocol/openid-connect/token"
     G2P_BRIDGE_KEYMANAGER_AUTH_CLIENT_ID: '{{ tpl .Values.global.g2pBridgeClientId $ }}'
     G2P_BRIDGE_KEYMANAGER_AUTH_CLIENT_SECRET: '{{ tpl .Values.global.g2pBridgeClientSecret $ }}'
@@ -44,7 +50,10 @@ openg2p-g2p-bridge-celery-workers:
     G2P_BRIDGE_CELERY_PRODUCERS_FUNDS_BLOCK_URL_EXAMPLE_BANK: '{{ tpl .Values.global.g2pBridgeExampleBankBaseUrl $ }}/block_funds'
     G2P_BRIDGE_CELERY_PRODUCERS_FUNDS_DISBURSEMENT_URL_EXAMPLE_BANK: '{{ tpl .Values.global.g2pBridgeExampleBankBaseUrl $ }}/initiate_payment'
 
+    G2P_BRIDGE_CELERY_WORKERS_SIGN_KEY_KEYMANAGER_APP_ID: '{{ tpl .Values.global.keymanagerG2pBridgeAppId $ }}'
+
     G2P_BRIDGE_CELERY_WORKERS_KEYMANAGER_API_BASE_URL: 'http://{{ tpl .Values.keymanagerInstallationName $ }}/v1/keymanager'
+    G2P_BRIDGE_CELERY_WORKERS_KEYMANAGER_AUTH_ENABLED: '{{ .Values.global.keymanagerAuthEnabled }}'
     G2P_BRIDGE_CELERY_WORKERS_KEYMANAGER_AUTH_URL: '{{ tpl .Values.global.keycloakIssuerUrl $ }}/protocol/openid-connect/token'
     G2P_BRIDGE_CELERY_WORKERS_KEYMANAGER_AUTH_CLIENT_ID: '{{ tpl .Values.global.g2pBridgeClientId $ }}'
     G2P_BRIDGE_CELERY_WORKERS_KEYMANAGER_AUTH_CLIENT_SECRET: '{{ tpl .Values.global.g2pBridgeClientSecret $ }}'
@@ -76,14 +85,14 @@ redis:
     enabled: false
 
 artifactory:
-  enabled: true
+  enabled: false
   image:
     repository: mosipid/artifactory-server
     tag: 1.4.1-ES
   resources: {}
 
 softhsm:
-  enabled: true
+  enabled: false
   # Hardcoding this for now. else every upgrade will reset the pin
   securityPIN: MTg5MTAwMTc=
   resources: {}
@@ -91,6 +100,10 @@ softhsm:
 keymanager:
   enabled: true
   hostname: '{{ tpl .Values.global.g2pBridgeHostname $ }}'
+  authEnabled: '{{ .Values.global.keymanagerAuthEnabled }}'
+  istio:
+    enabled: true
+  keystoreType: PKCS12
   springConfig:
     names: application,kernel
     profile: default
@@ -100,8 +113,6 @@ keymanager:
       branch: master
     rawConfig: ""
   envVars:
-    mosip_kernel_keymanager_autogen_appids_list: ROOT,G2PBRIDGE
-    mosip_kernel_keymanager_autogen_basekeys_list: 'G2PBRIDGE:ENCRYPT'
     auth_server_admin_allowed_audience: 'openg2p-g2p-bridge,openg2p-g2p-bridge-{{ .Release.Namespace }}'
   envVarsFrom:
     db_dbuser_password:
@@ -109,13 +120,15 @@ keymanager:
         name: '{{ .Release.Name }}-postgresql-addl-user-passwords'
         key: keymgruser
   postgresInit:
-    commonAnnotations:
-      "helm.sh/hook-weight": "0"
     envVarsFrom:
       DBUSER_PWD:
         secretKeyRef:
           name: '{{ .Release.Name }}-postgresql-addl-user-passwords'
           key: keymgruser
   keygen:
-    commonAnnotations:
-      "helm.sh/hook-weight": "1"
+    appIdsList:
+      - '{{ tpl .Values.global.keymanagerG2pBridgeAppId $ }}'
+    baseKeysList:
+      - '{{ tpl .Values.global.keymanagerG2pBridgeAppId $ }}:ENCRYPT'
+  persistence:
+    enabled: true

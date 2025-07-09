@@ -23,16 +23,25 @@ questions:
   description: Keycloak Base Url used in all components
   type: string
   label: Keycloak Base URL
+  # Currently this is required only for the purpose of keymanager.
+  # Change this "show_if" condition later if this is required for other purposes also.
+  show_if: "keymanager.enabled=true&&global.keymanagerAuthEnabled=true"
 
 - variable: global.g2pBridgeClientId
   description: OIDC Client ID for G2P Bridge
   type: string
   label: OIDC Client ID
+  # Currently this is required only for the purpose of keymanager.
+  # Change this "show_if" condition later if this is required for other purposes also.
+  show_if: "keymanager.enabled=true&&global.keymanagerAuthEnabled=true"
 
 - variable: global.g2pBridgeClientSecret
   description: OIDC Client Secret for G2P Bridge
   type: string
   label: OIDC Client Secret
+  # Currently this is required only for the purpose of keymanager.
+  # Change this "show_if" condition later if this is required for other purposes also.
+  show_if: "keymanager.enabled=true&&global.keymanagerAuthEnabled=true"
 
 - variable: openg2p-g2p-bridge-celery-workers.envVars.G2P_BRIDGE_CELERY_WORKERS_MAPPER_RESOLVE_API_URL
   description: URL to reach resolve API SPAR Mapper
@@ -49,6 +58,22 @@ questions:
   type: boolean
   label: Install Keymanager?
   group: Keymanager Settings
+
+- variable: global.keymanagerAuthEnabled
+  label: API Authentication Enabled
+  description: Enables Keymanager API Authentication.
+  type: boolean
+  show_if: "keymanager.enabled=true"
+  group: Keymanager Settings
+
+- variable: keymanager.istio.enabled
+  label: Expose Keymanager APIs
+  description: >-
+    Enable this to manually download/upload certificates to Keymanager.
+    This exposes Keymanager APIs publicly outside Kubernetes.
+  type: boolean
+  group: Keymanager Settings
+  show_if: "keymanager.enabled=true"
 
 - variable: keymanager.springConfig.profile
   type: string
@@ -100,4 +125,21 @@ questions:
   type: string
   label: Allowed Keycloak Client IDs.
   group: Keymanager Settings
+  show_if: "keymanager.enabled=true&&global.keymanagerAuthEnabled=true"
+
+- variable: keymanager.keystoreType
+  label: Keystore Type
+  description: PKCS11 for HSM. PKCS12 for storing into local p12 file.
+  type: enum
+  options:
+    - PKCS11
+    - PKCS12
+  group: Keymanager Settings
   show_if: "keymanager.enabled=true"
+
+- variable: keymanager.persistence.enabled
+  label: Persistence Enabled
+  description: Enable this if Keystore Type is PKCS12.
+  type: boolean
+  show_if: "keymanager.enabled=true"
+  group: Keymanager Settings

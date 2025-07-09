@@ -1,5 +1,5 @@
 global:
-  g2pBridgeHostname: g2p-bridge.sandbox.openg2p.net
+  g2pBridgeHostname: g2p-bridge.openg2p.sandbox.net
 
 ## Pod extra labels
 ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/

@@ -8,6 +8,7 @@ dependencies:
   repository: oci://registry-1.docker.io/bitnamicharts
   version: 2.x.x
 keywords:
+  - openg2p-g2p-bridge
   - openg2p-g2p-bridge-celery-workers
 maintainers:
   - email: info@openg2p.org

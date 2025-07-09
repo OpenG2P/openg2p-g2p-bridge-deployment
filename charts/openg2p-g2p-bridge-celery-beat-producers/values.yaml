@@ -228,7 +228,14 @@ postgresCheckerInit:
   command:
   - 'sh'
   - '-c'
-  - 'until pg_isready -U ${G2P_BRIDGE_DB_USERNAME} -h ${G2P_BRIDGE_DB_HOSTNAME} -p ${G2P_BRIDGE_DB_PORT:-5432} -d ${G2P_BRIDGE_DB_DBNAME:-bridgedb}; do sleep 3; done'
+  - >-
+    until pg_isready
+    -U ${G2P_BRIDGE_CELERY_BEAT_DB_USERNAME}
+    -h ${G2P_BRIDGE_CELERY_BEAT_DB_HOSTNAME}
+    -p ${G2P_BRIDGE_CELERY_BEAT_DB_PORT:-5432}
+    -d ${G2P_BRIDGE_CELERY_BEAT_DB_DBNAME:-bridgedb};
+    do sleep 3;
+    done
 
 postgresqlInstallationName: '{{ .Release.Name }}-postgresql'
 redisInstallationName: '{{ .Release.Name }}-redis-master'
