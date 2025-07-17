@@ -44,13 +44,12 @@ openg2p-g2p-bridge-celery-workers:
   keymanagerInstallationName: '{{ .Release.Name }}-keymanager'
 
   envVars:
-    G2P_BRIDGE_CELERY_WORKERS_MAPPER_RESOLVE_API_URL: 'http://spar-spar-mapper-api/sync/resolve'
-
     G2P_BRIDGE_CELERY_PRODUCERS_FUNDS_AVAILABLE_CHECK_URL_EXAMPLE_BANK: '{{ tpl .Values.global.g2pBridgeExampleBankBaseUrl $ }}/check_funds'
     G2P_BRIDGE_CELERY_PRODUCERS_FUNDS_BLOCK_URL_EXAMPLE_BANK: '{{ tpl .Values.global.g2pBridgeExampleBankBaseUrl $ }}/block_funds'
     G2P_BRIDGE_CELERY_PRODUCERS_FUNDS_DISBURSEMENT_URL_EXAMPLE_BANK: '{{ tpl .Values.global.g2pBridgeExampleBankBaseUrl $ }}/initiate_payment'
 
-    G2P_BRIDGE_CELERY_WORKERS_SIGN_KEY_KEYMANAGER_APP_ID: '{{ tpl .Values.global.keymanagerG2pBridgeAppId $ }}'
+    G2P_BRIDGE_CELERY_WORKERS_MAPPER_API_URL: 'http://spar-spar-mapper-api/sync'
+    G2P_BRIDGE_CELERY_WORKERS_MAPPER_API_SIGN_KEYMANAGER_APP_ID: '{{ tpl .Values.global.keymanagerG2pBridgeAppId $ }}'
 
     G2P_BRIDGE_CELERY_WORKERS_KEYMANAGER_API_BASE_URL: 'http://{{ tpl .Values.keymanagerInstallationName $ }}/v1/keymanager'
     G2P_BRIDGE_CELERY_WORKERS_KEYMANAGER_AUTH_ENABLED: '{{ .Values.global.keymanagerAuthEnabled }}'
