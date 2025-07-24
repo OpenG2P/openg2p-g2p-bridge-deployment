@@ -2,7 +2,7 @@ apiVersion: v2
 name: openg2p-g2p-bridge-celery-workers
 description: A Helm chart for OpenG2P G2P Bridge Celery Workers
 type: application
-version: 1.1.0-develop
+version: 2.0-develop
 dependencies:
 - name: common
   repository: oci://registry-1.docker.io/bitnamicharts

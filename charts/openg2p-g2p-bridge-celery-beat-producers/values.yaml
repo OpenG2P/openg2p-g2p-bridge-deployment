@@ -37,8 +37,8 @@ serviceAccount:
   name: ""
 
 image:
-  repository: openg2p/openg2p-g2p-bridge-celery-beat-producers
-  tag: "1.1"
+  repository: psnappz/openg2p-g2p-bridge-celery-beat-producers
+  tag: "2.0"
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
   ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images

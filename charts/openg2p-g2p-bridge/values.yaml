@@ -1,9 +1,9 @@
 global:
-  g2pBridgeHostname: g2p-bridge.openg2p.sandbox.net
+  g2pBridgeHostname: g2p-bridge.dev.openg2p.org
 
   g2pBridgeExampleBankBaseUrl: http://openg2p-g2p-bridge-example-bank-api
 
-  keycloakBaseUrl: https://keycloak.your.org
+  keycloakBaseUrl: https://keycloak.openg2p.org
   keycloakIssuerUrl: '{{ tpl .Values.global.keycloakBaseUrl $ }}/realms/master'
 
   g2pBridgeClientId: 'openg2p-g2p-bridge-{{ .Release.Namespace }}'
@@ -11,6 +11,8 @@ global:
 
   keymanagerAuthEnabled: false
   keymanagerG2pBridgeAppId: OPENG2P_G2P_BRIDGE
+  pbmsInstallationName: 'pbms'
+  registryInstallationName: 'socialregistry'
 
 openg2p-g2p-bridge-api:
   enabled: true
@@ -31,11 +33,22 @@ openg2p-g2p-bridge-celery-beat-producers:
   enabled: true
   nameOverride: celery-beat-producer
   envVars:
-    G2P_BRIDGE_CELERY_BEAT_MAPPER_RESOLVE_FREQUENCY: 10
-    G2P_BRIDGE_CELERY_BEAT_FUNDS_AVAILABLE_CHECK_FREQUENCY: 10
-    G2P_BRIDGE_CELERY_BEAT_FUNDS_BLOCKED_FREQUENCY: 10
-    G2P_BRIDGE_CELERY_BEAT_FUNDS_DISBURSEMENT_FREQUENCY: 10
-    G2P_BRIDGE_CELERY_BEAT_MT940_PROCESSOR_FREQUENCY: 10
+    G2P_BRIDGE_CELERY_BEAT_MAPPER_RESOLVE_FREQUENCY: 30
+    G2P_BRIDGE_CELERY_BEAT_FUNDS_AVAILABLE_CHECK_FREQUENCY: 30
+    G2P_BRIDGE_CELERY_BEAT_FUNDS_BLOCKED_FREQUENCY: 30
+    G2P_BRIDGE_CELERY_BEAT_FUNDS_DISBURSEMENT_FREQUENCY: 30
+    G2P_BRIDGE_CELERY_BEAT_MT940_PROCESSOR_FREQUENCY: 30
+    G2P_BRIDGE_CELERY_BEAT_GEO_RESOLUTION_FREQUENCY: 30
+    G2P_BRIDGE_CELERY_BEAT_WAREHOUSE_ALLOCATION_FREQUENCY: 30
+    G2P_BRIDGE_CELERY_BEAT_AGENCY_ALLOCATION_FREQUENCY: 30
+    G2P_BRIDGE_CELERY_BEAT_WAREHOUSE_NOTIFICATION_FREQUENCY: 30
+    G2P_BRIDGE_CELERY_BEAT_AGENCY_NOTIFICATION_FREQUENCY: 30
+    G2P_BRIDGE_CELERY_BEAT_BENEFICIARY_NOTIFICATION_FREQUENCY: 30
+
+    G2P_BRIDGE_CELERY_BEAT_NO_OF_TASKS_TO_PROCESS: 2
+    G2P_BRIDGE_CELERY_BEAT_PROCESS_FUTURE_DISBURSEMENT_SCHEDULES: true
+    G2P_BRIDGE_CELERY_BEAT_TASK_STALE_THRESHOLD_MINUTES: 30
+    
 
 openg2p-g2p-bridge-celery-workers:
   enabled: true
@@ -44,18 +57,59 @@ openg2p-g2p-bridge-celery-workers:
   keymanagerInstallationName: '{{ .Release.Name }}-keymanager'
 
   envVars:
-    G2P_BRIDGE_CELERY_PRODUCERS_FUNDS_AVAILABLE_CHECK_URL_EXAMPLE_BANK: '{{ tpl .Values.global.g2pBridgeExampleBankBaseUrl $ }}/check_funds'
-    G2P_BRIDGE_CELERY_PRODUCERS_FUNDS_BLOCK_URL_EXAMPLE_BANK: '{{ tpl .Values.global.g2pBridgeExampleBankBaseUrl $ }}/block_funds'
-    G2P_BRIDGE_CELERY_PRODUCERS_FUNDS_DISBURSEMENT_URL_EXAMPLE_BANK: '{{ tpl .Values.global.g2pBridgeExampleBankBaseUrl $ }}/initiate_payment'
+    G2P_BRIDGE_CELERY_WORKERS_FUNDS_AVAILABLE_CHECK_URL_EXAMPLE_BANK: '{{ tpl .Values.global.g2pBridgeExampleBankBaseUrl $ }}/check_funds'
+    G2P_BRIDGE_CELERY_WORKERS_FUNDS_BLOCK_URL_EXAMPLE_BANK: '{{ tpl .Values.global.g2pBridgeExampleBankBaseUrl $ }}/block_funds'
+    G2P_BRIDGE_CELERY_WORKERS_FUNDS_DISBURSEMENT_URL_EXAMPLE_BANK: '{{ tpl .Values.global.g2pBridgeExampleBankBaseUrl $ }}/initiate_payment'
 
-    G2P_BRIDGE_CELERY_WORKERS_MAPPER_API_URL: 'http://spar-spar-mapper-api/sync'
+    G2P_BRIDGE_CELERY_WORKERS_MAPPER_RESOLVE_API_URL: 'http://spar-spar-mapper-api/sync'
     G2P_BRIDGE_CELERY_WORKERS_MAPPER_API_SIGN_KEYMANAGER_APP_ID: '{{ tpl .Values.global.keymanagerG2pBridgeAppId $ }}'
+    G2P_BRIDGE_CELERY_WORKERS_MAPPER_REQUEST_JWT_ENABLED: 'false'
 
     G2P_BRIDGE_CELERY_WORKERS_KEYMANAGER_API_BASE_URL: 'http://{{ tpl .Values.keymanagerInstallationName $ }}/v1/keymanager'
     G2P_BRIDGE_CELERY_WORKERS_KEYMANAGER_AUTH_ENABLED: '{{ .Values.global.keymanagerAuthEnabled }}'
     G2P_BRIDGE_CELERY_WORKERS_KEYMANAGER_AUTH_URL: '{{ tpl .Values.global.keycloakIssuerUrl $ }}/protocol/openid-connect/token'
     G2P_BRIDGE_CELERY_WORKERS_KEYMANAGER_AUTH_CLIENT_ID: '{{ tpl .Values.global.g2pBridgeClientId $ }}'
     G2P_BRIDGE_CELERY_WORKERS_KEYMANAGER_AUTH_CLIENT_SECRET: '{{ tpl .Values.global.g2pBridgeClientSecret $ }}'
+
+    # Max Attempts
+    G2P_BRIDGE_CELERY_WORKERS_AGENCY_ALLOCATION_MAX_ATTEMPTS: 3
+    G2P_BRIDGE_CELERY_WORKERS_WAREHOUSE_ALLOCATION_MAX_ATTEMPTS: 3
+    G2P_BRIDGE_CELERY_WORKERS_GEO_RESOLUTION_MAX_ATTEMPTS: 3
+    G2P_BRIDGE_CELERY_WORKERS_MAPPER_RESOLUTION_MAX_ATTEMPTS: 3
+    G2P_BRIDGE_CELERY_WORKERS_CHECK_FUNDS_WITH_BANK_MAX_ATTEMPTS: 3
+    G2P_BRIDGE_CELERY_WORKERS_BLOCK_FUNDS_WITH_BANK_MAX_ATTEMPTS: 3
+    G2P_BRIDGE_CELERY_WORKERS_DISBURSE_FUNDS_WITH_BANK_MAX_ATTEMPTS: 3
+    G2P_BRIDGE_CELERY_WORKERS_MT940_PROCESSOR_MAX_ATTEMPTS: 3
+    G2P_BRIDGE_CELERY_WORKERS_AGENCY_NOTIFICATION_MAX_ATTEMPTS: 3
+    G2P_BRIDGE_CELERY_WORKERS_WAREHOUSE_NOTIFICATION_MAX_ATTEMPTS: 3
+    G2P_BRIDGE_CELERY_WORKERS_BENEFICIARY_NOTIFICATION_MAX_ATTEMPTS: 3
+
+    # Bank Connectors
+    G2P_BRIDGE_CELERY_WORKERS_FUNDS_AVAILABLE_CHECK_URL_EXAMPLE_BANK: 'http://127.0.0.1:8004/example-bank/check_funds'
+    G2P_BRIDGE_CELERY_WORKERS_FUNDS_BLOCK_URL_EXAMPLE_BANK: 'http://127.0.0.1:8004/example-bank/block_funds'
+    G2P_BRIDGE_CELERY_WORKERS_FUNDS_DISBURSEMENT_URL_EXAMPLE_BANK: 'http://127.0.0.1:8004/example-bank/initiate_payment'
+
+    # Agency Allocator
+    G2P_BRIDGE_CELERY_WORKERS_DB_DATASOURCE_PBMS: >-
+      postgresql://postgres:$(G2P_PBMS_DB_PASSWORD)@{{ tpl .Values.global.pbmsInstallationName $ }}-postgresql:5432/pbmsdb
+
+    # Warehouse Allocator
+    G2P_BRIDGE_CELERY_WORKERS_DB_DATASOURCE_PBMS: >-
+      postgresql://postgres:$(G2P_PBMS_DB_PASSWORD)@{{ tpl .Values.global.pbmsInstallationName $ }}-postgresql:5432/pbmsdb
+
+    # Geo Resolver
+    G2P_BRIDGE_CELERY_WORKERS_DB_ENGINE_REGISTRY: >-
+      postgresql://postgres:$(G2P_REGISTRY_DB_PASSWORD)@{{ tpl .Values.global.registryInstallationName $ }}-postgresql:5432/socialregistrydb
+
+  envVarsFrom:
+    G2P_PBMS_DB_PASSWORD:
+      secretKeyRef:
+        name: '{{ tpl .Values.global.pbmsInstallationName $ }}-postgresql'
+        key: postgres-password
+    G2P_REGISTRY_DB_PASSWORD:
+      secretKeyRef:
+        name: '{{ tpl .Values.global.registryInstallationName $ }}-postgresql'
+        key: postgres-password
 
 postgresql:
   enabled: true
