@@ -39,7 +39,7 @@ serviceAccount:
   name: ""
 
 image:
-  repository: psnappz/openg2p-g2p-bridge-api
+  repository: openg2p/openg2p-g2p-bridge-api
   tag: "2.0"
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
