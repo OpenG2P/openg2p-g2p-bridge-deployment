@@ -25,28 +25,28 @@ questions:
   label: Keycloak Base URL
   # Currently this is required only for the purpose of keymanager.
   # Change this "show_if" condition later if this is required for other purposes also.
-  show_if: "keymanager.enabled=true&&global.keymanagerAuthEnabled=true"
+  show_if: "keymanager.enabled=true&&global.g2pBridgeKeymanagerAuthEnabled=true"
 
-- variable: global.g2pBridgeClientId
+- variable: global.g2pBridgeAuthClientId
   description: OIDC Client ID for G2P Bridge
   type: string
   label: OIDC Client ID
   # Currently this is required only for the purpose of keymanager.
   # Change this "show_if" condition later if this is required for other purposes also.
-  show_if: "keymanager.enabled=true&&global.keymanagerAuthEnabled=true"
+  show_if: "keymanager.enabled=true&&global.g2pBridgeKeymanagerAuthEnabled=true"
 
-- variable: global.g2pBridgeClientSecret
+- variable: global.g2pBridgeAuthClientSecret
   description: OIDC Client Secret for G2P Bridge
   type: string
   label: OIDC Client Secret
   # Currently this is required only for the purpose of keymanager.
   # Change this "show_if" condition later if this is required for other purposes also.
-  show_if: "keymanager.enabled=true&&global.keymanagerAuthEnabled=true"
+  show_if: "keymanager.enabled=true&&global.g2pBridgeKeymanagerAuthEnabled=true"
 
-- variable: openg2p-g2p-bridge-celery-workers.envVars.G2P_BRIDGE_CELERY_WORKERS_MAPPER_RESOLVE_API_URL
-  description: URL to reach resolve API SPAR Mapper
+- variable: global.g2pBridgeMapperBaseUrl
+  description: Base URL to reach SPAR Mapper
   type: string
-  label: Mapper Resolve API URL
+  label: Mapper API Base URL
 
 - variable: global.g2pBridgeExampleBankBaseUrl
   type: string
@@ -59,12 +59,12 @@ questions:
   label: Install Keymanager?
   group: Keymanager Settings
 
-- variable: global.keymanagerAuthEnabled
+- variable: global.g2pBridgeKeymanagerAuthEnabled
   label: API Authentication Enabled
   description: Enables Keymanager API Authentication.
   type: boolean
-  show_if: "keymanager.enabled=true"
   group: Keymanager Settings
+  show_if: "keymanager.enabled=true"
 
 - variable: keymanager.istio.enabled
   label: Expose Keymanager APIs
@@ -125,7 +125,7 @@ questions:
   type: string
   label: Allowed Keycloak Client IDs.
   group: Keymanager Settings
-  show_if: "keymanager.enabled=true&&global.keymanagerAuthEnabled=true"
+  show_if: "keymanager.enabled=true&&global.g2pBridgeKeymanagerAuthEnabled=true"
 
 - variable: keymanager.keystoreType
   label: Keystore Type
@@ -141,5 +141,21 @@ questions:
   label: Persistence Enabled
   description: Enable this if Keystore Type is PKCS12.
   type: boolean
-  show_if: "keymanager.enabled=true"
   group: Keymanager Settings
+  show_if: "keymanager.enabled=true"
+
+- variable: artifactory.enabled
+  label: Install Artifactory?
+  description: >-
+    This is mandatory if Keymanger API Auth is enabled. Or if
+    Keymanager Keystore type is PKCS11.
+  type: boolean
+  group: Keymanager Settings
+  show_if: "keymanager.enabled=true"
+
+- variable: softhsm.enabled
+  label: Install Softhsm?
+  description: Enable this if Keystore Type is PKCS11.
+  type: boolean
+  group: Keymanager Settings
+  show_if: "keymanager.enabled=true"
