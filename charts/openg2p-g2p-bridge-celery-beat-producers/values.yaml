@@ -227,6 +227,7 @@ postgresCheckerInit:
     #   - myRegistryKeySecretName
   command:
   - 'sh'
+  args:
   - '-c'
   - >-
     until pg_isready
@@ -236,6 +237,8 @@ postgresCheckerInit:
     -d ${G2P_BRIDGE_CELERY_BEAT_DB_DBNAME:-bridgedb};
     do sleep 3;
     done
+  containerSecurityContext:
+    enabled: false
 
 postgresqlInstallationName: '{{ .Release.Name }}-postgresql'
 redisInstallationName: '{{ .Release.Name }}-redis-master'
