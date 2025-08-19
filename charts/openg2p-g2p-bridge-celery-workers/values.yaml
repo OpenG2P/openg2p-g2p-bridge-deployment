@@ -38,7 +38,7 @@ serviceAccount:
 
 image:
   repository: openg2p/openg2p-g2p-bridge-celery-workers
-  tag: "1.1"
+  tag: "2.0"
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
   ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
@@ -148,7 +148,7 @@ envVars:
   G2P_BRIDGE_CELERY_WORKERS_CELERY_BROKER_URL: redis://{{ tpl .Values.redisInstallationName $ }}:6379/0
   G2P_BRIDGE_CELERY_WORKERS_CELERY_BACKEND_URL: redis://{{ tpl .Values.redisInstallationName $ }}:6379/0
 
-  G2P_BRIDGE_CELERY_WORKERS_MAPPER_RESOLVE_API_URL: 'http://mapper/sync/resolve'
+  G2P_BRIDGE_CELERY_WORKERS_MAPPER_CLIENT_API_BASE_URL: 'http://mapper/sync'
 
 envVarsFrom:
   G2P_BRIDGE_CELERY_WORKERS_DB_PASSWORD:
@@ -229,6 +229,7 @@ postgresCheckerInit:
     #   - myRegistryKeySecretName
   command:
   - 'sh'
+  args:
   - '-c'
   - >-
     until pg_isready
@@ -238,6 +239,8 @@ postgresCheckerInit:
     -d ${G2P_BRIDGE_CELERY_WORKERS_DB_DBNAME:-bridgedb};
     do sleep 3;
     done
+  containerSecurityContext:
+    enabled: false
 
 postgresqlInstallationName: '{{ .Release.Name }}-postgresql'
 redisInstallationName: '{{ .Release.Name }}-redis-master'

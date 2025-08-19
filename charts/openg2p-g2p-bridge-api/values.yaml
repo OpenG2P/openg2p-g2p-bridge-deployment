@@ -1,5 +1,4 @@
-global:
-  g2pBridgeHostname: g2p-bridge.openg2p.sandbox.net
+hostname: g2p-bridge.openg2p.sandbox.net
 
 ## Pod extra labels
 ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
@@ -40,7 +39,7 @@ serviceAccount:
 
 image:
   repository: openg2p/openg2p-g2p-bridge-api
-  tag: "1.1"
+  tag: "2.0"
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
   ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
@@ -141,13 +140,15 @@ containerSecurityContext:
   runAsUser: 1001
   runAsNonRoot: true
 
+openapiRootPath: /api/g2p-bridge
+
 envVars:
   G2P_BRIDGE_DB_DBNAME: openg2p_g2p_bridge_db
   G2P_BRIDGE_DB_HOSTNAME: '{{ tpl .Values.postgresqlInstallationName $ }}'
   G2P_BRIDGE_DB_PORT: 5432
   G2P_BRIDGE_DB_USERNAME: bridgeuser
   G2P_BRIDGE_PORT: '{{ .Values.containerPort }}'
-  G2P_BRIDGE_OPENAPI_ROOT_PATH: '/api/g2p-bridge'
+  G2P_BRIDGE_OPENAPI_ROOT_PATH: '{{ tpl .Values.openapiRootPath $ }}'
 
 envVarsFrom:
   G2P_BRIDGE_DB_PASSWORD:
@@ -226,7 +227,7 @@ istio:
     gateway: "internal"
     destination: '{{ template "common.names.fullname" . }}'
     destinationPort: '{{ .Values.service.port }}'
-    prefix: /api/g2p-bridge/
+    prefix: '{{ tpl .Values.openapiRootPath $ }}/'
     rewriteUri: "/"
   gateway:
     enabled: false
@@ -279,7 +280,10 @@ postgresCheckerInit:
     #   - myRegistryKeySecretName
   command:
   - 'sh'
+  args:
   - '-c'
   - 'until pg_isready -U ${G2P_BRIDGE_DB_USERNAME} -h ${G2P_BRIDGE_DB_HOSTNAME} -p ${G2P_BRIDGE_DB_PORT:-5432} -d ${G2P_BRIDGE_DB_DBNAME:-bridgedb}; do sleep 3; done'
+  containerSecurityContext:
+    enabled: false
 
 postgresqlInstallationName: '{{ .Release.Name }}-postgresql'
