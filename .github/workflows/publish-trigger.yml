@@ -1,10 +1,6 @@
 name: Publish OpenG2P Helm charts
 
 on:
-  push:
-    branches-ignore:
-      - develop
-      - main
   workflow_dispatch:
     inputs:
       forcePublishCharts:
