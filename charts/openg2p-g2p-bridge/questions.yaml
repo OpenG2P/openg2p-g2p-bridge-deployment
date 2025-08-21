@@ -52,6 +52,18 @@ questions:
   type: string
   label: Bank APIs Base URL
 
+- variable: global.PBMSDBHostname
+  description: PBMS Database Hostname
+  type: string
+  label: PBMS Database Hostname
+  show_if: "openg2p-g2p-bridge-celery-workers.enabled=true"
+
+- variable: global.registryDBHostname
+  description: Registry Database Hostname
+  type: string
+  label: Registry Database Hostname
+  show_if: "openg2p-g2p-bridge-celery-workers.enabled=true"
+
 # Keymanager
 - variable: keymanager.enabled
   description: This installs Keymanager for managing Keys for Encrpytion and Signatures
@@ -63,6 +75,13 @@ questions:
   label: API Authentication Enabled
   description: Enables Keymanager API Authentication.
   type: boolean
+  group: Keymanager Settings
+  show_if: "keymanager.enabled=true"
+
+- variable: global.g2pBridgeKeymanagerAppId
+  description: Keymanager Application ID for G2P Bridge
+  type: string
+  label: Keymanager App ID
   group: Keymanager Settings
   show_if: "keymanager.enabled=true"
 
