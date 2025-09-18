@@ -84,7 +84,7 @@ openg2p-g2p-bridge-celery-workers:
     G2PCONNECT_MAPPER_UNLINK_CLIENT_API_SIGN_ENABLED: false
 
     # Bank Connectors
-    G2P_BRIDGE_CELERY_WORKERS_FUNDS_AVAILABLE_CHECK_URL_EXAMPLE_BANK: '{{ tpl .Values.global.g2pBridgeExampleBankBaseUrl $ }}/check_funds
+    G2P_BRIDGE_CELERY_WORKERS_FUNDS_AVAILABLE_CHECK_URL_EXAMPLE_BANK: '{{ tpl .Values.global.g2pBridgeExampleBankBaseUrl $ }}/check_funds'
     G2P_BRIDGE_CELERY_WORKERS_FUNDS_BLOCK_URL_EXAMPLE_BANK: '{{ tpl .Values.global.g2pBridgeExampleBankBaseUrl $ }}/block_funds'
     G2P_BRIDGE_CELERY_WORKERS_FUNDS_DISBURSEMENT_URL_EXAMPLE_BANK: '{{ tpl .Values.global.g2pBridgeExampleBankBaseUrl $ }}/initiate_payment'
     G2P_BRIDGE_CELERY_WORKERS_BANK_SIMULATOR_CODE: EXAMPLE
