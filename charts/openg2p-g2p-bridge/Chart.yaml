@@ -25,13 +25,13 @@ dependencies:
   version: 12.0.1
   condition: softhsm.enabled
 - name: openg2p-g2p-bridge-api
-  version: 2.0-develop
+  version: 2.0.0
   condition: openg2p-g2p-bridge-api.enabled
 - name: openg2p-g2p-bridge-celery-beat-producers
-  version: 2.0-develop
+  version: 2.0.0
   condition: openg2p-g2p-bridge-celery-beat-producers.enabled
 - name: openg2p-g2p-bridge-celery-workers
-  version: 2.0-develop
+  version: 2.0.0
   condition: openg2p-g2p-bridge-celery-workers.enabled
 keywords:
   - openg2p-g2p-bridge
