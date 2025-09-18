@@ -1,19 +1,13 @@
-global:
-  g2pBridgeHostname: g2p-bridge.sandbox.openg2p.net
-
-nameOverride: openg2p-g2p-bridge-api
-fullnameOverride: openg2p-g2p-bridge-api
+hostname: g2p-bridge.openg2p.sandbox.net
 
 ## Pod extra labels
 ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
 ##
-podLabels:
-  app.kubernetes.io/name: openg2p-g2p-bridge-api
+podLabels: {}
 
 ## Add labels to all the deployed resources
 ##
-commonLabels:
-  app.kubernetes.io/group: openg2p-g2p-bridge
+commonLabels: {}
 
 ## Add annotations to all the deployed resources
 ##
@@ -34,76 +28,18 @@ replicaCount: 1
 updateStrategy:
   type: RollingUpdate
 
-## Prometheus Metrics
-##
-metrics:
-  enabled: true
-  ## Prometheus pod annotations
-  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
-  ##
-  podAnnotations:
-    prometheus.io/scrape: "true"
-
-  endpointPath: /api/g2p-bridge/metrics
-
-  ## Prometheus Service Monitor
-  ## ref: https://github.com/coreos/prometheus-operator
-  ##
-  serviceMonitor:
-    ## If the operator is installed in your cluster, set to true to create a Service Monitor Entry
-    ##
-    enabled: true
-    ## Specify the namespace in which the serviceMonitor resource will be created
-    ##
-    # namespace: ""
-    ## Specify the interval at which metrics should be scraped
-    ##
-    interval: 10s
-    ## Specify the timeout after which the scrape is ended
-    ##
-    # scrapeTimeout: 30s
-    ## Specify Metric Relabellings to add to the scrape endpoint
-    ##
-    # relabellings:
-    ## Specify honorLabels parameter to add the scrape endpoint
-    ##
-    honorLabels: false
-    ## Used to pass Labels that are used by the Prometheus installed in your cluster to select Service Monitors to work with
-    ## ref: https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#prometheusspec
-    ##
-    additionalLabels: {}
-
-  ## Custom PrometheusRule to be defined
-  ## The value is evaluated as a template, so, for example, the value can depend on .Release or .Chart
-  ## ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
-  ##
-  prometheusRule:
-    enabled: false
-    additionalLabels: {}
-    namespace: ''
-    ## List of rules, used as template by Helm.
-    ## These are just examples rules inspired from https://awesome-prometheus-alerts.grep.to/rules.html
-    # rules:
-    #   - alert: RabbitmqDown
-    #     expr: rabbitmq_up{service="{{ template "rabbitmq.fullname" . }}"} == 0
-    #     for: 5m
-    #     labels:
-    #       severity: error
-    rules: []
-
 ## Specifies whether a ServiceAccount should be created
 ##
 serviceAccount:
-  create: true
+  create: false
   ## The name of the ServiceAccount to use.
   ## If not set and create is true, a name is generated using the fullname template
   ##
-  name: openg2p-g2p-bridge-api
+  name: ""
 
 image:
-  registry: docker.io
   repository: openg2p/openg2p-g2p-bridge-api
-  tag: 1.0.0
+  tag: "2.0.0"
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
   ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
@@ -115,40 +51,6 @@ image:
   ##
   # pullSecrets:
   #   - myRegistryKeySecretName
-
-## Init containers parameters:
-## volumePermissions: Change the owner and group of the persistent volume mountpoint to runAsUser:fsGroup values from the securityContext section.
-##
-volumePermissions:
-  enabled: false
-  image:
-    registry: docker.io
-    repository: bitnami/bitnami-shell
-    tag: "10"
-    pullPolicy: Always
-    ## Optionally specify an array of imagePullSecrets.
-    ## Secrets must be manually created in the namespace.
-    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
-    ##
-    pullSecrets: []
-    ##   - myRegistryKeySecretName
-  ## Init containers' resource requests and limits
-  ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
-  ##
-  resources:
-    ## We usually recommend not to specify default resources and to leave this as a conscious
-    ## choice for the user. This also increases chances charts run on environments with little
-    ## resources, such as Minikube. If you do want to specify resources, uncomment the following
-    ## lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-    ##
-    limits: {}
-    ##   cpu: 100m
-    ##   memory: 128Mi
-    ##
-    requests: {}
-    ##   cpu: 100m
-    ##   memory: 128Mi
-    ##
 
 ## Deployment pod host aliases
 ## https://kubernetes.io/docs/concepts/services-networking/add-entries-to-pod-etc-hosts-with-host-aliases/
@@ -238,26 +140,23 @@ containerSecurityContext:
   runAsUser: 1001
   runAsNonRoot: true
 
+openapiRootPath: /api/g2p-bridge
+
 envVars:
   G2P_BRIDGE_DB_DBNAME: openg2p_g2p_bridge_db
-  G2P_BRIDGE_DB_HOSTNAME: '{{ include "postgresql.v1.primary.fullname" .Subcharts.postgresql }}'
+  G2P_BRIDGE_DB_HOSTNAME: '{{ tpl .Values.postgresqlInstallationName $ }}'
   G2P_BRIDGE_DB_PORT: 5432
   G2P_BRIDGE_DB_USERNAME: bridgeuser
-  G2P_BRIDGE_WORKER_TYPE: gunicorn
-  G2P_BRIDGE_HOST: 0.0.0.0
-  G2P_BRIDGE_PORT: '8000'
-  G2P_BRIDGE_NO_OF_WORKERS: '1'
-  G2P_BRIDGE_OPENAPI_ROOT_PATH: '/api/g2p-bridge'
+  G2P_BRIDGE_PORT: '{{ .Values.containerPort }}'
+  G2P_BRIDGE_OPENAPI_ROOT_PATH: '{{ tpl .Values.openapiRootPath $ }}'
 
 envVarsFrom:
   G2P_BRIDGE_DB_PASSWORD:
     secretKeyRef:
-      name: '{{ include "postgresql.v1.primary.fullname" .Subcharts.postgresql }}'
+      name: '{{ tpl .Values.postgresqlInstallationName $ }}'
       key: password
 
-g2pBridgeAPIPort: 8000
-
-## ref: http://kubernetes.io/docs/user-guide/compute-postgresqlInstallationNameresources/
+## ref: http://kubernetes.io/docs/user-guide/compute-resources/
 ##
 ## We usually recommend not to specify default resources and to leave this as a conscious
 ## choice for the user. This also increases chances charts run on environments with little
@@ -279,7 +178,7 @@ startupProbe:
   enabled: true
   httpGet:
     path: /ping
-    port: 8000
+    port: http
   initialDelaySeconds: 0
   periodSeconds: 10
   timeoutSeconds: 5
@@ -290,7 +189,7 @@ livenessProbe:
   enabled: true
   httpGet:
     path: /ping
-    port: 8000
+    port: http
   initialDelaySeconds: 20
   periodSeconds: 30
   timeoutSeconds: 5
@@ -301,20 +200,12 @@ readinessProbe:
   enabled: true
   httpGet:
     path: /ping
-    port: 8000
+    port: http
   initialDelaySeconds: 0
   periodSeconds: 10
   timeoutSeconds: 5
   failureThreshold: 6
   successThreshold: 1
-
-## Custom Rediness probes
-##
-customReadinessProbe: {}
-
-## Custom Liveness probes for
-##
-customLivenessProbe: {}
 
 ## Add sidecars to the  pods.
 ## Example:
@@ -336,7 +227,7 @@ istio:
     gateway: "internal"
     destination: '{{ template "common.names.fullname" . }}'
     destinationPort: '{{ .Values.service.port }}'
-    prefix: /api/g2p-bridge/
+    prefix: '{{ tpl .Values.openapiRootPath $ }}/'
     rewriteUri: "/"
   gateway:
     enabled: false
@@ -349,6 +240,8 @@ istio:
     tls:
       mode: SIMPLE
       credentialName: ""
+
+containerPort: 8000
 
 service:
   type: ClusterIP
@@ -377,38 +270,20 @@ autoscaling:
   targetCPUUtilizationPercentage: 80
   targetMemoryUtilizationPercentage: 80
 
-ingress:
-  enabled: false
-  className: ""
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
-    kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
-  hosts:
-    - host: ""
-      paths:
-        - path: /api/g2p-bridge(/|$)(.*)
-          pathType: ImplementationSpecific
-  tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
-
 postgresCheckerInit:
   enabled: true
-  image: jbergknoff/postgresql-client
+  image:
+    repository: jbergknoff/postgresql-client
+    tag: latest
+    pullPolicy: IfNotPresent
+    # pullSecrets:
+    #   - myRegistryKeySecretName
   command:
   - 'sh'
+  args:
   - '-c'
   - 'until pg_isready -U ${G2P_BRIDGE_DB_USERNAME} -h ${G2P_BRIDGE_DB_HOSTNAME} -p ${G2P_BRIDGE_DB_PORT:-5432} -d ${G2P_BRIDGE_DB_DBNAME:-bridgedb}; do sleep 3; done'
+  containerSecurityContext:
+    enabled: false
 
-postgresql:
-  enabled: true
-  auth:
-    username: bridgeuser
-    database: openg2p_g2p_bridge_db
-  primary:
-    extendedConfiguration: |-
-      wal_level = logical
-      max_wal_senders = 20
-      max_replication_slots = 10
+postgresqlInstallationName: '{{ .Release.Name }}-postgresql'
