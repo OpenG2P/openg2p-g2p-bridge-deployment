@@ -2,7 +2,7 @@ apiVersion: v2
 name: openg2p-g2p-bridge
 description: A Helm chart for OpenG2P G2P Bridge
 type: application
-version: 2.0-develop
+version: 2.0.0
 dependencies:
 - name: postgresql
   repository: oci://registry-1.docker.io/bitnamicharts
