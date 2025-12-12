@@ -24,24 +24,11 @@ dependencies:
   repository: https://mosip.github.io/mosip-helm
   version: 12.0.1
   condition: softhsm.enabled
-- name: openg2p-g2p-bridge-api
-  version: 2.0.0
-  condition: openg2p-g2p-bridge-api.enabled
-- name: openg2p-g2p-bridge-celery-beat-producers
-  version: 2.0.0
-  condition: openg2p-g2p-bridge-celery-beat-producers.enabled
-- name: openg2p-g2p-bridge-celery-workers
-  version: 2.0.0
-  condition: openg2p-g2p-bridge-celery-workers.enabled
-- name: openg2p-g2p-bridge-bene-portal-api
-  version: 2.0.0
-  condition: openg2p-g2p-bridge-bene-portal-api.enabled
+- name: common
+  repository: oci://registry-1.docker.io/bitnamicharts
+  version: 2.x.x
 keywords:
   - openg2p-g2p-bridge
-  - openg2p-g2p-bridge-api
-  - openg2p-g2p-bridge-celery-beat-producers
-  - openg2p-g2p-bridge-celery-workers
-  - openg2p-g2p-bridge-bene-portal-api
   - g2p-bridge
 maintainers:
   - email: info@openg2p.org
