@@ -34,6 +34,10 @@ openg2p-g2p-bridge-api:
     G2P_BRIDGE_OAUTH_CLIENT_ID: '{{ tpl .Values.global.g2pBridgeAuthClientId $ }}'
     G2P_BRIDGE_OAUTH_CLIENT_SECRET: '{{ tpl .Values.global.g2pBridgeAuthClientSecret $ }}'
 
+openg2p-g2p-bridge-bene-portal-api:
+  enabled: true
+  nameOverride: bene-portal-api
+
 openg2p-g2p-bridge-celery-beat-producers:
   enabled: true
   nameOverride: celery-beat-producer

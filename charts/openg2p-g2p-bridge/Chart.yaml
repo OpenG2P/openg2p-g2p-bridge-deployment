@@ -33,11 +33,15 @@ dependencies:
 - name: openg2p-g2p-bridge-celery-workers
   version: 2.0.0
   condition: openg2p-g2p-bridge-celery-workers.enabled
+- name: openg2p-g2p-bridge-bene-portal-api
+  version: 2.0.0
+  condition: openg2p-g2p-bridge-bene-portal-api.enabled
 keywords:
   - openg2p-g2p-bridge
   - openg2p-g2p-bridge-api
   - openg2p-g2p-bridge-celery-beat-producers
   - openg2p-g2p-bridge-celery-workers
+  - openg2p-g2p-bridge-bene-portal-api
   - g2p-bridge
 maintainers:
   - email: info@openg2p.org
