@@ -161,7 +161,7 @@ openg2pG2pBridgeApi:
   postgresqlInstallationName: '{{ .Release.Name }}-postgresql'
   containerPort: 8000
 
-openg2p-g2p-bridge-bene-portal-api:
+openg2pG2pBridgeBenePortalApi:
   enabled: true
   nameOverride: bene-portal-api
   hostname: g2p-bridge-bene-portal.openg2p.sandbox.net
@@ -172,7 +172,7 @@ openg2p-g2p-bridge-bene-portal-api:
     create: false
     name: ""
   image:
-    repository: openg2p/openg2p-g2p-bridge-bene-portal-api
+    repository: openg2p/openg2pG2pBridgeBenePortalApi
     tag: "2.0.0"
     pullPolicy: Always
   podSecurityContext:
@@ -259,7 +259,7 @@ openg2p-g2p-bridge-bene-portal-api:
   postgresqlInstallationName: '{{ .Release.Name }}-postgresql'
   containerPort: 8000
 
-openg2p-g2p-bridge-celery-beat-producers:
+g2pBridgeCeleryBeatProducers:
   enabled: true
   nameOverride: celery-beat-producer
   replicaCount: 1
