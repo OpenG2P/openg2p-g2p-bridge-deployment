@@ -1,4 +1,4 @@
-{{- $values := .Values.openg2p-g2p-bridge-celery-workers -}}
+{{- $values := .Values.g2pBridgeCeleryWorkers -}}
 {{- $context := dict "Values" (merge (deepCopy $values) (dict "global" .Values.global)) "Chart" .Chart "Release" .Release "Files" .Files "Capabilities" .Capabilities -}}
 {{- with $context -}}
 apiVersion: {{ include "common.capabilities.deployment.apiVersion" . }}
