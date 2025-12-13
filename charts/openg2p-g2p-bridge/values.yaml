@@ -52,7 +52,7 @@ postgresInit:
       secret: '{{ tpl .Values.global.bridgeDBSecret $ }}'
       secretUserPasswordKey: '{{ tpl .Values.global.bridgeDBUserPasswordKey $ }}'
 
-openg2pG2pBridgeApi:
+g2pBridgeApi:
   enabled: true
   nameOverride: api
   hostname: '{{ tpl .Values.global.g2pBridgeHostname $ }}'
