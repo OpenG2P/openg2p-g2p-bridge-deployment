@@ -16,7 +16,7 @@ global:
   g2pBridgeExampleBankBaseUrl: http://openg2p-g2p-bridge-example-bank-api
   
   keycloakBaseUrl: https://keycloak.openg2p.org
-  keycloakIssuerUrl: '{{ tpl .Values.keycloakBaseUrl $ }}/realms/master'
+  keycloakIssuerUrl: '{{ .Values.global.keycloakBaseUrl }}/realms/master'
   
   #g2pBridgeMapperBaseUrl: 'http://spar-spar-mapper-api/sync'
   g2pBridgeMapperBaseUrl: 'http://{{ .Release.Name }}-spar-mapper-api/sync'
@@ -59,6 +59,12 @@ g2pBridgeApi:
   hostname: '{{ tpl .Values.global.g2pBridgeHostname $ }}'
 
   replicaCount: 1
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: 80
   updateStrategy:
     type: RollingUpdate
   serviceAccount:
@@ -89,9 +95,11 @@ g2pBridgeApi:
       enabled: true
       gateway: "internal"
       destination: '{{ template "common.names.fullname" . }}'
-      destinationPort: '{{ .Values.service.port }}'
-      prefix: '{{ tpl .Values.openapiRootPath $ }}/'
+      destinationPort: 80
+      prefix: '{{ .Values.openapiRootPath }}/'
       rewriteUri: "/"
+    gateway:
+      enabled: false
   
   envVars:
     G2P_BRIDGE_DB_HOSTNAME: '{{ .Values.global.postgresqlHost }}'
@@ -99,14 +107,14 @@ g2pBridgeApi:
     G2P_BRIDGE_DB_PORT: 5432
     G2P_BRIDGE_DB_USERNAME: '{{ tpl .Values.global.bridgeDBUser $ }}'
     G2P_BRIDGE_PORT: '{{ .Values.containerPort }}'
-    G2P_BRIDGE_OPENAPI_ROOT_PATH: '{{ tpl .Values.openapiRootPath $ }}'
+    G2P_BRIDGE_OPENAPI_ROOT_PATH: '{{ .Values.openapiRootPath }}'
     
-    G2P_BRIDGE_JWT_VALIDATE_KEYMANAGER_APP_ID: '{{ tpl .Values.g2pBridgeKeymanagerAppId $ }}'
-    G2P_BRIDGE_KEYMANAGER_API_BASE_URL: "http://{{ tpl .Values.keymanagerInstallationName $ }}/v1/keymanager"
-    G2P_BRIDGE_OAUTH_ENABLED: '{{ .Values.g2pBridgeKeymanagerAuthEnabled }}'
-    G2P_BRIDGE_OAUTH_URL: "{{ tpl .Values.keycloakIssuerUrl $ }}/protocol/openid-connect/token"
-    G2P_BRIDGE_OAUTH_CLIENT_ID: '{{ tpl .Values.g2pBridgeAuthClientId $ }}'
-    G2P_BRIDGE_OAUTH_CLIENT_SECRET: '{{ tpl .Values.g2pBridgeAuthClientSecret $ }}'
+    G2P_BRIDGE_JWT_VALIDATE_KEYMANAGER_APP_ID: '{{ .Values.global.g2pBridgeKeymanagerAppId }}'
+    G2P_BRIDGE_KEYMANAGER_API_BASE_URL: "http://{{ .Values.global.keymanagerInstallationName }}/v1/keymanager"
+    G2P_BRIDGE_OAUTH_ENABLED: '{{ .Values.global.g2pBridgeKeymanagerAuthEnabled }}'
+    G2P_BRIDGE_OAUTH_URL: "{{ tpl .Values.global.keycloakIssuerUrl $ }}/protocol/openid-connect/token"
+    G2P_BRIDGE_OAUTH_CLIENT_ID: '{{ tpl .Values.global.g2pBridgeAuthClientId $ }}'
+    G2P_BRIDGE_OAUTH_CLIENT_SECRET: '{{ .Values.global.g2pBridgeAuthClientSecret }}'
 
   envVarsFrom:
     G2P_BRIDGE_DB_PASSWORD:
@@ -167,6 +175,12 @@ openg2pG2pBridgeBenePortalApi:
   nameOverride: bene-portal-api
   hostname: g2p-bridge-bene-portal.openg2p.sandbox.net
   replicaCount: 1
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: 80
   updateStrategy:
     type: RollingUpdate
   serviceAccount:
@@ -197,9 +211,11 @@ openg2pG2pBridgeBenePortalApi:
       enabled: true
       gateway: "internal"
       destination: '{{ template "common.names.fullname" . }}'
-      destinationPort: '{{ .Values.service.port }}'
-      prefix: '{{ tpl .Values.openapiRootPath $ }}/'
+      destinationPort: 80
+      prefix: '{{ .Values.openapiRootPath }}/'
       rewriteUri: "/"
+    gateway:
+      enabled: false
   
   envVars:
     BRIDGE_BENE_PORTAL_API_DB_HOSTNAME: '{{ .Values.global.postgresqlHost }}'
@@ -275,8 +291,8 @@ g2pBridgeCeleryBeatProducers:
     G2P_BRIDGE_CELERY_BEAT_DB_PORT: 5432
     G2P_BRIDGE_CELERY_BEAT_DB_USERNAME: '{{ tpl .Values.global.bridgeDBUser $ }}'
 
-    G2P_BRIDGE_CELERY_BEAT_CELERY_BROKER_URL: redis://{{ tpl .Values.redisInstallationName $ }}:6379/0
-    G2P_BRIDGE_CELERY_BEAT_CELERY_BACKEND_URL: redis://{{ tpl .Values.redisInstallationName $ }}:6379/0
+    G2P_BRIDGE_CELERY_BEAT_CELERY_BROKER_URL: redis://{{ tpl .Values.global.redisInstallationName $ }}:6379/0
+    G2P_BRIDGE_CELERY_BEAT_CELERY_BACKEND_URL: redis://{{ tpl .Values.global.redisInstallationName $ }}:6379/0
 
     G2P_BRIDGE_CELERY_BEAT_MAPPER_RESOLVE_FREQUENCY: 30
     G2P_BRIDGE_CELERY_BEAT_FUNDS_AVAILABLE_CHECK_FREQUENCY: 30
@@ -340,53 +356,53 @@ g2pBridgeCeleryWorkers:
     G2P_BRIDGE_CELERY_WORKERS_DB_DBNAME: '{{ tpl .Values.global.bridgeDB $ }}'
     G2P_BRIDGE_CELERY_WORKERS_DB_PORT: 5432
     G2P_BRIDGE_CELERY_WORKERS_DB_USERNAME: '{{ tpl .Values.global.bridgeDBUser $ }}'
-    G2P_BRIDGE_CELERY_WORKERS_CELERY_BROKER_URL: redis://{{ tpl .Values.redisInstallationName $ }}:6379/0
-    G2P_BRIDGE_CELERY_WORKERS_CELERY_BACKEND_URL: redis://{{ tpl .Values.redisInstallationName $ }}:6379/0
+    G2P_BRIDGE_CELERY_WORKERS_CELERY_BROKER_URL: redis://{{ tpl .Values.global.redisInstallationName $ }}:6379/0
+    G2P_BRIDGE_CELERY_WORKERS_CELERY_BACKEND_URL: redis://{{ tpl .Values.global.redisInstallationName $ }}:6379/0
     
-    G2PCONNECT_MAPPER_CLIENT_API_BASE_URL: '{{ tpl .Values.g2pBridgeMapperBaseUrl $ }}'
+    G2PCONNECT_MAPPER_CLIENT_API_BASE_URL: '{{ tpl .Values.global.g2pBridgeMapperBaseUrl $ }}'
     G2P_BRIDGE_CELERY_WORKERS_MAPPER_REQUEST_SENDER_ID: openg2p-g2p-bridge
     
-    G2P_BRIDGE_CELERY_WORKERS_KEYMANAGER_API_BASE_URL: 'http://{{ tpl .Values.keymanagerInstallationName $ }}/v1/keymanager'
-    G2P_BRIDGE_CELERY_WORKERS_KEYMANAGER_SIGN_APP_ID: '{{ tpl .Values.g2pBridgeKeymanagerAppId $ }}'
-    G2P_BRIDGE_CELERY_WORKERS_OAUTH_ENABLED: '{{ .Values.g2pBridgeKeymanagerAuthEnabled }}'
-    G2P_BRIDGE_CELERY_WORKERS_OAUTH_URL: '{{ tpl .Values.keycloakIssuerUrl $ }}/protocol/openid-connect/token'
-    G2P_BRIDGE_CELERY_WORKERS_OAUTH_CLIENT_ID: '{{ tpl .Values.g2pBridgeAuthClientId $ }}'
-    G2P_BRIDGE_CELERY_WORKERS_OAUTH_CLIENT_SECRET: '{{ tpl .Values.g2pBridgeAuthClientSecret $ }}'
+    G2P_BRIDGE_CELERY_WORKERS_KEYMANAGER_API_BASE_URL: 'http://{{ .Values.global.keymanagerInstallationName }}/v1/keymanager'
+    G2P_BRIDGE_CELERY_WORKERS_KEYMANAGER_SIGN_APP_ID: '{{ .Values.global.g2pBridgeKeymanagerAppId }}'
+    G2P_BRIDGE_CELERY_WORKERS_OAUTH_ENABLED: '{{ .Values.global.g2pBridgeKeymanagerAuthEnabled }}'
+    G2P_BRIDGE_CELERY_WORKERS_OAUTH_URL: '{{ tpl .Values.global.keycloakIssuerUrl $ }}/protocol/openid-connect/token'
+    G2P_BRIDGE_CELERY_WORKERS_OAUTH_CLIENT_ID: '{{ tpl .Values.global.g2pBridgeAuthClientId $ }}'
+    G2P_BRIDGE_CELERY_WORKERS_OAUTH_CLIENT_SECRET: '{{ .Values.global.g2pBridgeAuthClientSecret }}'
 
-    G2P_BRIDGE_CELERY_WORKERS_DB_HOSTNAME_PBMS: "{{ tpl .Values.PBMSDBHostname $ }}"
-    G2P_BRIDGE_CELERY_WORKERS_DB_DBNAME_PBMS: '{{ tpl .Values.PBMSDB $ }}'
+    G2P_BRIDGE_CELERY_WORKERS_DB_HOSTNAME_PBMS: "{{ tpl .Values.global.PBMSDBHostname $ }}"
+    G2P_BRIDGE_CELERY_WORKERS_DB_DBNAME_PBMS: '{{ tpl .Values.global.PBMSDB $ }}'
     G2P_BRIDGE_CELERY_WORKERS_DB_PORT_PBMS: 5432
-    G2P_BRIDGE_CELERY_WORKERS_DB_USERNAME_PBMS: '{{ tpl .Values.PBMSDBUser $ }}'
+    G2P_BRIDGE_CELERY_WORKERS_DB_USERNAME_PBMS: '{{ tpl .Values.global.PBMSDBUser $ }}'
 
     G2PCONNECT_MAPPER_LINK_CLIENT_API_SIGN_ENABLED: false
     G2PCONNECT_MAPPER_UPDATE_CLIENT_API_SIGN_ENABLED: false
     G2PCONNECT_MAPPER_RESOLVE_CLIENT_API_SIGN_ENABLED: false
     G2PCONNECT_MAPPER_UNLINK_CLIENT_API_SIGN_ENABLED: false
 
-    G2P_BRIDGE_CELERY_WORKERS_FUNDS_AVAILABLE_CHECK_URL_EXAMPLE_BANK: '{{ tpl .Values.g2pBridgeExampleBankBaseUrl $ }}/check_funds'
-    G2P_BRIDGE_CELERY_WORKERS_FUNDS_BLOCK_URL_EXAMPLE_BANK: '{{ tpl .Values.g2pBridgeExampleBankBaseUrl $ }}/block_funds'
-    G2P_BRIDGE_CELERY_WORKERS_FUNDS_DISBURSEMENT_URL_EXAMPLE_BANK: '{{ tpl .Values.g2pBridgeExampleBankBaseUrl $ }}/initiate_payment'
+    G2P_BRIDGE_CELERY_WORKERS_FUNDS_AVAILABLE_CHECK_URL_EXAMPLE_BANK: '{{ tpl .Values.global.g2pBridgeExampleBankBaseUrl $ }}/check_funds'
+    G2P_BRIDGE_CELERY_WORKERS_FUNDS_BLOCK_URL_EXAMPLE_BANK: '{{ tpl .Values.global.g2pBridgeExampleBankBaseUrl $ }}/block_funds'
+    G2P_BRIDGE_CELERY_WORKERS_FUNDS_DISBURSEMENT_URL_EXAMPLE_BANK: '{{ tpl .Values.global.g2pBridgeExampleBankBaseUrl $ }}/initiate_payment'
     G2P_BRIDGE_CELERY_WORKERS_BANK_SIMULATOR_CODE: EXAMPLE
 
-    G2P_BRIDGE_AGENCY_ALLOCATOR_DB_USERNAME_PBMS: '{{ tpl .Values.PBMSDBUser $ }}'
-    G2P_BRIDGE_AGENCY_ALLOCATOR_DB_HOSTNAME_PBMS: "{{ tpl .Values.PBMSDBHostname $ }}"
+    G2P_BRIDGE_AGENCY_ALLOCATOR_DB_USERNAME_PBMS: '{{ tpl .Values.global.PBMSDBUser $ }}'
+    G2P_BRIDGE_AGENCY_ALLOCATOR_DB_HOSTNAME_PBMS: "{{ tpl .Values.global.PBMSDBHostname $ }}"
     G2P_BRIDGE_AGENCY_ALLOCATOR_DB_PORT_PBMS: 5432
-    G2P_BRIDGE_AGENCY_ALLOCATOR_DB_DBNAME_PBMS: '{{ tpl .Values.PBMSDB $ }}'
+    G2P_BRIDGE_AGENCY_ALLOCATOR_DB_DBNAME_PBMS: '{{ tpl .Values.global.PBMSDB $ }}'
 
-    G2P_BRIDGE_WAREHOUSE_ALLOCATOR_DB_USERNAME_PBMS: '{{ tpl .Values.PBMSDBUser $ }'
-    G2P_BRIDGE_WAREHOUSE_ALLOCATOR_DB_HOSTNAME_PBMS: "{{ tpl .Values.PBMSDBHostname $ }}"
+    G2P_BRIDGE_WAREHOUSE_ALLOCATOR_DB_USERNAME_PBMS: '{{ tpl .Values.global.PBMSDBUser $ }}'
+    G2P_BRIDGE_WAREHOUSE_ALLOCATOR_DB_HOSTNAME_PBMS: "{{ tpl .Values.global.PBMSDBHostname $ }}"
     G2P_BRIDGE_WAREHOUSE_ALLOCATOR_DB_PORT_PBMS: 5432
-    G2P_BRIDGE_WAREHOUSE_ALLOCATOR_DB_DBNAME_PBMS: '{{ tpl .Values.PBMSDB $ }}'
+    G2P_BRIDGE_WAREHOUSE_ALLOCATOR_DB_DBNAME_PBMS: '{{ tpl .Values.global.PBMSDB $ }}'
 
-    G2P_BRIDGE_GEO_RESOLVER_DB_USERNAME_REGISTRY: '{{ tpl .Values.registryDBUser $ }}'
-    G2P_BRIDGE_GEO_RESOLVER_DB_HOSTNAME_REGISTRY: "{{ tpl .Values.registryDBHostname $ }}"
+    G2P_BRIDGE_GEO_RESOLVER_DB_USERNAME_REGISTRY: '{{ tpl .Values.global.registryDBUser $ }}'
+    G2P_BRIDGE_GEO_RESOLVER_DB_HOSTNAME_REGISTRY: "{{ tpl .Values.global.registryDBHostname $ }}"
     G2P_BRIDGE_GEO_RESOLVER_DB_PORT_REGISTRY: 5432
-    G2P_BRIDGE_GEO_RESOLVER_DB_DBNAME_REGISTRY: '{{ tpl .Values.registryDB $ }}'
+    G2P_BRIDGE_GEO_RESOLVER_DB_DBNAME_REGISTRY: '{{ tpl .Values.global.registryDB $ }}'
 
-    G2P_BRIDGE_MAPPER_CONNECTORS_DB_USERNAME_REGISTRY: '{{ tpl .Values.registryDBUser $ }}'
-    G2P_BRIDGE_MAPPER_CONNECTORS_DB_HOSTNAME_REGISTRY: "{{ tpl .Values.registryDBHostname $ }}"
+    G2P_BRIDGE_MAPPER_CONNECTORS_DB_USERNAME_REGISTRY: '{{ tpl .Values.global.registryDBUser $ }}'
+    G2P_BRIDGE_MAPPER_CONNECTORS_DB_HOSTNAME_REGISTRY: "{{ tpl .Values.global.registryDBHostname $ }}"
     G2P_BRIDGE_MAPPER_CONNECTORS_DB_PORT_REGISTRY: 5432
-    G2P_BRIDGE_MAPPER_CONNECTORS_DB_DBNAME_REGISTRY:  '{{ tpl .Values.registryDB $ }}'
+    G2P_BRIDGE_MAPPER_CONNECTORS_DB_DBNAME_REGISTRY:  '{{ tpl .Values.global.registryDB $ }}'
     
     G2P_BRIDGE_CELERY_WORKERS_SUPPRESS_NOTIFICATIONS: true
     
@@ -409,24 +425,24 @@ g2pBridgeCeleryWorkers:
         key: '{{ tpl .Values.global.bridgeDBUserPasswordKey $ }}'
     G2P_BRIDGE_CELERY_WORKERS_DB_PASSWORD_PBMS:
       secretKeyRef:
-        name: '{{ tpl .Values.PBMSDBSecret $ }}'
-        key: '{{ tpl .Values.PBMSDBUserPasswordKey $ }}'
+        name: '{{ tpl .Values.global.PBMSDBSecret $ }}'
+        key: '{{ tpl .Values.global.PBMSDBUserPasswordKey $ }}'
     G2P_BRIDGE_WAREHOUSE_ALLOCATOR_DB_PASSWORD_PBMS:
       secretKeyRef:
-        name: '{{ tpl .Values.PBMSDBSecret $ }}'
-        key: '{{ tpl .Values.PBMSDBUserPasswordKey $ }}'
+        name: '{{ tpl .Values.global.PBMSDBSecret $ }}'
+        key: '{{ tpl .Values.global.PBMSDBUserPasswordKey $ }}'
     G2P_BRIDGE_GEO_RESOLVER_DB_PASSWORD_REGISTRY:
       secretKeyRef:
-        name: '{{ tpl .Values.registryDBSecret $ }}'
-        key: '{{ tpl .Values.registryDBUserPasswordKey $ }}'
+        name: '{{ tpl .Values.global.registryDBSecret $ }}'
+        key: '{{ tpl .Values.global.registryDBUserPasswordKey $ }}'
     G2P_BRIDGE_MAPPER_CONNECTORS_DB_PASSWORD_REGISTRY:
       secretKeyRef:
-        name: '{{ tpl .Values.registryDBSecret $ }}'
-        key: '{{ tpl .Values.registryDBUserPasswordKey $ }}'
+        name: '{{ tpl .Values.global.registryDBSecret $ }}'
+        key: '{{ tpl .Values.global.registryDBUserPasswordKey $ }}'
     G2P_BRIDGE_AGENCY_ALLOCATOR_DB_PASSWORD_PBMS:
       secretKeyRef:
-        name: '{{ tpl .Values.PBMSDBSecret $ }}'
-        key: '{{ tpl .Values.PBMSDBUserPasswordKey $ }}'
+        name: '{{ tpl .Values.global.PBMSDBSecret $ }}'
+        key: '{{ tpl .Values.global.PBMSDBUserPasswordKey $ }}'
 
   postgresCheckerInit:
     enabled: true

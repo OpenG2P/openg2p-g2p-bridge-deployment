@@ -31,10 +31,13 @@ spec:
       {{- if .Values.affinity }}
       affinity: {{- include "common.tplvalues.render" ( dict "value" .Values.affinity "context" $) | nindent 8 }}
       {{- else }}
+      {{- $podAffinityPreset := default "" .Values.podAffinityPreset -}}
+      {{- $podAntiAffinityPreset := default "" .Values.podAntiAffinityPreset -}}
+      {{- $nodeAffinityPreset := default (dict "type" "" "key" "" "values" (list)) .Values.nodeAffinityPreset -}}
       affinity:
-        podAffinity: {{- include "common.affinities.pods" (dict "type" .Values.podAffinityPreset "context" $) | nindent 10 }}
-        podAntiAffinity: {{- include "common.affinities.pods" (dict "type" .Values.podAntiAffinityPreset "context" $) | nindent 10 }}
-        nodeAffinity: {{- include "common.affinities.nodes" (dict "type" .Values.nodeAffinityPreset.type "key" .Values.nodeAffinityPreset.key "values" .Values.nodeAffinityPreset.values) | nindent 10 }}
+        podAffinity: {{- include "common.affinities.pods" (dict "type" $podAffinityPreset "context" $) | nindent 10 }}
+        podAntiAffinity: {{- include "common.affinities.pods" (dict "type" $podAntiAffinityPreset "context" $) | nindent 10 }}
+        nodeAffinity: {{- include "common.affinities.nodes" (dict "type" $nodeAffinityPreset.type "key" $nodeAffinityPreset.key "values" $nodeAffinityPreset.values) | nindent 10 }}
       {{- end }}
       {{- if .Values.nodeSelector }}
       nodeSelector: {{- include "common.tplvalues.render" ( dict "value" .Values.nodeSelector "context" $) | nindent 8 }}
@@ -45,7 +48,7 @@ spec:
       {{- if .Values.priorityClassName }}
       priorityClassName: {{ .Values.priorityClassName | quote }}
       {{- end }}
-      {{- if .Values.podSecurityContext.enabled }}
+      {{- if and .Values.podSecurityContext .Values.podSecurityContext.enabled }}
       securityContext: {{- include "common.tplvalues.render" (dict "value" (omit .Values.podSecurityContext "enabled") "context" $) | nindent 8 }}
       {{- end }}
       {{- if or .Values.postgresCheckerInit.enabled .Values.initContainers }}
@@ -60,7 +63,7 @@ spec:
           {{- if .Values.postgresCheckerInit.args }}
           args: {{- include "common.tplvalues.render" (dict "value" .Values.postgresCheckerInit.args "context" $) | nindent 12 }}
           {{- end }}
-          {{- if .Values.postgresCheckerInit.containerSecurityContext.enabled }}
+          {{- if and .Values.postgresCheckerInit.containerSecurityContext .Values.postgresCheckerInit.containerSecurityContext.enabled }}
           securityContext: {{- include "common.tplvalues.render" (dict "value" (omit .Values.postgresCheckerInit.containerSecurityContext "enabled") "context" $) | nindent 12 }}
           {{- end }}
           env: {{- include "g2pBridgeProducer.envVars" . | indent 12 }}
@@ -76,7 +79,7 @@ spec:
           {{- if .Values.lifecycleHooks }}
           lifecycle: {{- include "common.tplvalues.render" (dict "value" .Values.lifecycleHooks "context" $) | nindent 12 }}
           {{- end }}
-          {{- if .Values.containerSecurityContext.enabled }}
+          {{- if and .Values.containerSecurityContext .Values.containerSecurityContext.enabled }}
           securityContext: {{- include "common.tplvalues.render" (dict "value" (omit .Values.containerSecurityContext "enabled") "context" $) | nindent 12 }}
           {{- end }}
           env: {{- include "g2pBridgeProducer.envVars" . | indent 12 }}
@@ -89,13 +92,13 @@ spec:
           {{- if .Values.args }}
           args: {{- include "common.tplvalues.render" (dict "value" .Values.args "context" $) | nindent 12 }}
           {{- end }}
-          {{- if .Values.startupProbe.enabled }}
+          {{- if and .Values.startupProbe .Values.startupProbe.enabled }}
           startupProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.startupProbe "enabled") "context" $) | nindent 12 }}
           {{- end }}
-          {{- if .Values.livenessProbe.enabled }}
+          {{- if and .Values.livenessProbe .Values.livenessProbe.enabled }}
           livenessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.livenessProbe "enabled") "context" $) | nindent 12 }}
           {{- end }}
-          {{- if .Values.readinessProbe.enabled }}
+          {{- if and .Values.readinessProbe .Values.readinessProbe.enabled }}
           readinessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.readinessProbe "enabled") "context" $) | nindent 12 }}
           {{- end }}
           {{- if .Values.extraVolumeMounts }}
