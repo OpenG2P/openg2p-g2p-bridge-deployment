@@ -152,3 +152,8 @@ Render Env values section
 {{- end }}
 {{- end }}
 {{- end -}}
+
+{{- define "g2pBridgeWorker.envVars" -}}
+{{- $envVars := merge (deepCopy .Values.envVars) (deepCopy .Values.envVarsFrom) -}}
+{{- include "g2pBridgeWorker.baseEnvVars" (dict "envVars" $envVars "context" $) }}
+{{- end -}}
