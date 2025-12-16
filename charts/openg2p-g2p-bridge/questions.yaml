@@ -1,5 +1,6 @@
 questions:
 #TODO: Add questions for PBMS host, PBMS DB, Registry Host, Registry DB.
+
 - variable: global.g2pBridgeHostname
   description: Hostname under which all Bridge services will be accessed
   type: string

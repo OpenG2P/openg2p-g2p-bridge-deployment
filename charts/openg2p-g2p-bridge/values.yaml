@@ -11,7 +11,7 @@ global:
   # Default name of Redis that is installed with this chart
   redisInstallationName: '{{ .Release.Name }}-redis-master'
   
-  g2pBridgeHostname: g2p-bridge.zmb.openg2p.org
+  g2pBridgeHostname: g2p-bridge.devops.openg2p.org
   
   g2pBridgeExampleBankBaseUrl: http://openg2p-g2p-bridge-example-bank-api
   
