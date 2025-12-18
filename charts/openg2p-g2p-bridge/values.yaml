@@ -18,8 +18,7 @@ global:
   keycloakBaseUrl: https://keycloak.openg2p.org
   keycloakIssuerUrl: '{{ .Values.global.keycloakBaseUrl }}/realms/master'
   
-  #g2pBridgeMapperBaseUrl: 'http://spar-spar-mapper-api/sync'
-  g2pBridgeMapperBaseUrl: 'http://{{ .Release.Name }}-spar-mapper-api/sync'
+  g2pBridgeMapperBaseUrl: 'http://spar-mapper-api/sync'
   
   g2pBridgeAuthClientId: 'openg2p-g2p-bridge-{{ .Release.Namespace }}'
   g2pBridgeAuthClientSecret: ''
