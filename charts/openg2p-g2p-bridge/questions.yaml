@@ -94,31 +94,31 @@ questions:
   group: PBMS
 
 # Registry DB
-- variable: global.RegistryDBHostname
+- variable: global.registryDBHostname
   description: Registry database hostname
   type: string
   label: Registry Database Hostname
   group: Registry
 
-- variable: global.RegistryDB
+- variable: global.registryDB
   description: Registry Database
   type: string
   label: Registry Database 
   group: Registry
 
-- variable: global.RegistryDBUser
+- variable: global.registryDBUser
   description: Registry database user
   type: string
   label: Registry Database User 
   group: Registry
 
-- variable: global.RegistryDBSecret
+- variable: global.registryDBSecret
   description: Registry database user Kubernetes secret
   type: string
   label: Registry Database User Secret 
   group: Registry
 
-- variable: global.RegistryDBUserPasswordkey
+- variable: global.registryDBUserPasswordkey
   description: Registry database user password key
   type: string
   label: Registry Database User Password Key
