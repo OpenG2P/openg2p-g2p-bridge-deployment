@@ -1,12 +1,12 @@
 global:
-  postgresqlHost: openg2p-commons-postgresql
+  postgresqlHost: commons-postgresql
   bridgeDB: '{{ .Release.Name }}_db'
   bridgeDBUser: '{{ .Release.Name }}_db_user'
   bridgeDBSecret: '{{ .Release.Name }}'
   bridgeDBUserPasswordKey: '{{ .Release.Name }}_db_user'
 
     # Internal service name of Keymanager
-  keymanagerInstallationName: openg2p-commons-keymanager
+  keymanagerInstallationName: commons-keymanager
   
   # Default name of Redis that is installed with this chart
   redisInstallationName: '{{ .Release.Name }}-redis-master'
@@ -26,13 +26,13 @@ global:
   g2pBridgeKeymanagerAuthEnabled: false
   g2pBridgeKeymanagerAppId: G2PBRIDGE
   
-  PBMSDBHostname: openg2p-commons-postgresql
+  PBMSDBHostname: commons-postgresql
   PBMSDB: pbms_db
   PBMSDBUser: pbms_db_user
   PBMSDBSecret: pbms
   PBMSDBUserPasswordKey: pbms_db_user
   
-  registryDBHostname: openg2p-commons-postgresql
+  registryDBHostname: commons-postgresql
   registryDB: registry_db
   registryDBUser: registry_db_user
   registryDBSecret: registry
@@ -44,7 +44,7 @@ postgres-init:
     host: '{{ .Values.global.postgresqlHost }}'
     port: 5432
     # Hard coding. Same as one defined under Odoo
-    existingSecret: openg2p-commons-postgresql
+    existingSecret: commons-postgresql
     existingSecretPostgresPasswordKey: postgres-password
   databases:
     - name: '{{ tpl .Values.global.bridgeDB $ }}'
