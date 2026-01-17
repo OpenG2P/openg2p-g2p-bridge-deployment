@@ -5,30 +5,6 @@ questions:
   label: G2P Bridge Hostname
   group: General
 
-- variable: g2pBridgeApi.enabled
-  description: Install G2P Bridge API
-  type: boolean
-  label: G2P Bridge API
-  group: General
-
-- variable: g2pBridgeCeleryBeatProducers.enabled
-  description: Install Celery Beat Producers
-  type: boolean
-  label: Celery Beat Producers
-  group: General
-
-- variable: g2pBridgeCeleryWorkers.enabled
-  description: Install Celery Workers
-  type: boolean
-  label: Celery Workers
-  group: General
-
-- variable: openg2pG2pBridgeBenePortalApi.enabled
-  description: Install Beneficiary Portal API
-  type: boolean
-  label: Beneficiary Portal API
-  group: General
-
 # Keycloak
 - variable: global.keycloakBaseUrl
   description: Keycloak Base Url used in all components
@@ -37,16 +13,21 @@ questions:
   group: Keycloak
 
 - variable: global.g2pBridgeAuthClientId
-  description: OIDC Client ID for G2P Bridge
+  description: OIDC Client ID
   type: string
   label: OIDC Client ID
   group: Keycloak
 
 - variable: global.g2pBridgeAuthClientSecret
-  description: OIDC Client Secret for G2P Bridge
+  description: OIDC client Kuberenetes secret name
   type: string
-  label: OIDC Client Secret
+  label: OIDC Client Secret Name
   group: Keycloak
+
+- variable: global.g2pBridgeAuthClientSecretKey
+  description: Key containing OIDC client password
+  type: string
+  label: OIDC Client Secret Key
 
 # SPAR
 - variable: global.g2pBridgeMapperBaseUrl
@@ -72,19 +53,19 @@ questions:
 - variable: global.PBMSDB
   description: PBMS Database
   type: string
-  label: PBMS Database 
+  label: PBMS Database
   group: PBMS
 
 - variable: global.PBMSDBUser
   description: PBMS database user
   type: string
-  label: PBMS Database User 
+  label: PBMS Database User
   group: PBMS
 
 - variable: global.PBMSDBSecret
   description: PBMS database user Kubernetes secret
   type: string
-  label: PBMS Database User Secret 
+  label: PBMS Database User Secret
   group: PBMS
 
 - variable: global.PBMSDBUserPasswordkey
@@ -103,19 +84,19 @@ questions:
 - variable: global.registryDB
   description: Registry Database
   type: string
-  label: Registry Database 
+  label: Registry Database
   group: Registry
 
 - variable: global.registryDBUser
   description: Registry database user
   type: string
-  label: Registry Database User 
+  label: Registry Database User
   group: Registry
 
 - variable: global.registryDBSecret
   description: Registry database user Kubernetes secret
   type: string
-  label: Registry Database User Secret 
+  label: Registry Database User Secret
   group: Registry
 
 - variable: global.registryDBUserPasswordkey
@@ -135,5 +116,4 @@ questions:
   description: Keymanager Application ID for G2P Bridge
   type: string
   label: Keymanager App ID
-  group: Keymanager 
-
+  group: Keymanager

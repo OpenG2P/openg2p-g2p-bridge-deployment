@@ -7,37 +7,42 @@ global:
 
     # Internal service name of Keymanager
   keymanagerInstallationName: commons-keymanager
-  
+
   # Default name of Redis that is installed with this chart
   redisInstallationName: '{{ .Release.Name }}-redis-master'
-  
+
   g2pBridgeHostname: g2p-bridge.devops.openg2p.org
-  
+
   g2pBridgeExampleBankBaseUrl: http://openg2p-g2p-bridge-example-bank-api
-  
+
   keycloakBaseUrl: https://keycloak.openg2p.org
   keycloakIssuerUrl: '{{ .Values.global.keycloakBaseUrl }}/realms/master'
-  
+
   g2pBridgeMapperBaseUrl: 'http://spar-mapper-api/sync'
-  
+
+  # This is the typical default name of the client and secret
   g2pBridgeAuthClientId: 'openg2p-g2p-bridge-{{ .Release.Namespace }}'
-  g2pBridgeAuthClientSecret: ''
-  
+  # Name of the secret in Kuberentes containing (DO NOT password directly here)
+  # Same name as client id by convension.
+  g2pBridgeAuthClientSecret: '{{ tpl .Values.global.g2pBridgeAuthClientId $ }}'
+  # Key containing client password. Hardcoded in Keycloak Init script
+  g2pBridgeAuthClientSecretKey: 'client_secret'
+
   g2pBridgeKeymanagerAuthEnabled: false
   g2pBridgeKeymanagerAppId: G2PBRIDGE
-  
+
   PBMSDBHostname: commons-postgresql
   PBMSDB: pbms_db
   PBMSDBUser: pbms_db_user
   PBMSDBSecret: pbms
   PBMSDBUserPasswordKey: pbms_db_user
-  
+
   registryDBHostname: commons-postgresql
   registryDB: registry_db
   registryDBUser: registry_db_user
   registryDBSecret: registry
   registryDBUserPasswordKey: registry_db_user
-  
+
 postgres-init:
   enabled: true
   postgresql:
@@ -80,9 +85,9 @@ g2pBridgeApi:
     enabled: false
     runAsUser: 1001
     runAsNonRoot: true
-  
+
   openapiRootPath: /api/g2p-bridge
-  
+
   service:
     type: ClusterIP
     port: 80
@@ -99,7 +104,7 @@ g2pBridgeApi:
       rewriteUri: "/"
     gateway:
       enabled: false
-  
+
   envVars:
     G2P_BRIDGE_DB_HOSTNAME: '{{ .Values.global.postgresqlHost }}'
     G2P_BRIDGE_DB_DBNAME: '{{ tpl .Values.global.bridgeDB $ }}'
@@ -107,19 +112,21 @@ g2pBridgeApi:
     G2P_BRIDGE_DB_USERNAME: '{{ tpl .Values.global.bridgeDBUser $ }}'
     G2P_BRIDGE_PORT: '{{ .Values.containerPort }}'
     G2P_BRIDGE_OPENAPI_ROOT_PATH: '{{ .Values.openapiRootPath }}'
-    
+
     G2P_BRIDGE_JWT_VALIDATE_KEYMANAGER_APP_ID: '{{ .Values.global.g2pBridgeKeymanagerAppId }}'
     G2P_BRIDGE_KEYMANAGER_API_BASE_URL: "http://{{ .Values.global.keymanagerInstallationName }}/v1/keymanager"
     G2P_BRIDGE_OAUTH_ENABLED: '{{ .Values.global.g2pBridgeKeymanagerAuthEnabled }}'
     G2P_BRIDGE_OAUTH_URL: "{{ tpl .Values.global.keycloakIssuerUrl $ }}/protocol/openid-connect/token"
     G2P_BRIDGE_OAUTH_CLIENT_ID: '{{ tpl .Values.global.g2pBridgeAuthClientId $ }}'
-    G2P_BRIDGE_OAUTH_CLIENT_SECRET: '{{ .Values.global.g2pBridgeAuthClientSecret }}'
-
   envVarsFrom:
     G2P_BRIDGE_DB_PASSWORD:
       secretKeyRef:
         name: '{{ tpl .Values.global.bridgeDBSecret $ }}'
         key: '{{ tpl .Values.global.bridgeDBUserPasswordKey $ }}'
+    G2P_BRIDGE_OAUTH_CLIENT_SECRET:
+      secretKeyRef:
+        name: '{{ tpl .Values.global.g2pBridgeAuthClientSecret $ }}'
+        key: '{{ tpl .Values.global.g2pBridgeAuthClientSecretKey $ }}'
 
   startupProbe:
     enabled: true
@@ -151,7 +158,7 @@ g2pBridgeApi:
     timeoutSeconds: 5
     failureThreshold: 6
     successThreshold: 1
-  
+
   postgresCheckerInit:
     enabled: true
     image:
@@ -196,9 +203,9 @@ openg2pG2pBridgeBenePortalApi:
     enabled: false
     runAsUser: 1001
     runAsNonRoot: true
-  
+
   openapiRootPath: /api/bene-portal
-  
+
   service:
     type: ClusterIP
     port: 80
@@ -215,7 +222,7 @@ openg2pG2pBridgeBenePortalApi:
       rewriteUri: "/"
     gateway:
       enabled: false
-  
+
   envVars:
     BRIDGE_BENE_PORTAL_API_DB_HOSTNAME: '{{ .Values.global.postgresqlHost }}'
     BRIDGE_BENE_PORTAL_API_DB_DBNAME: '{{ tpl .Values.global.bridgeDB $ }}'
@@ -257,7 +264,7 @@ openg2pG2pBridgeBenePortalApi:
     timeoutSeconds: 5
     failureThreshold: 6
     successThreshold: 1
-  
+
   postgresCheckerInit:
     enabled: true
     image:
@@ -283,7 +290,7 @@ g2pBridgeCeleryBeatProducers:
     repository: openg2p/openg2p-g2p-bridge-celery-beat-producers
     tag: "2.0"
     pullPolicy: Always
-  
+
   envVars:
     G2P_BRIDGE_CELERY_BEAT_DB_HOSTNAME: '{{ .Values.global.postgresqlHost }}'
     G2P_BRIDGE_CELERY_BEAT_DB_DBNAME: '{{ tpl .Values.global.bridgeDB $ }}'
@@ -304,7 +311,7 @@ g2pBridgeCeleryBeatProducers:
     G2P_BRIDGE_CELERY_BEAT_WAREHOUSE_NOTIFICATION_FREQUENCY: 30
     G2P_BRIDGE_CELERY_BEAT_AGENCY_NOTIFICATION_FREQUENCY: 30
     G2P_BRIDGE_CELERY_BEAT_BENEFICIARY_NOTIFICATION_FREQUENCY: 30
-    
+
     G2P_BRIDGE_CELERY_BEAT_NO_OF_TASKS_TO_PROCESS: 2
     G2P_BRIDGE_CELERY_BEAT_DISBURSEMENT_RETRY_THRESHOLD_MINUTES: 30
     G2P_BRIDGE_CELERY_BEAT_PROCESS_FUTURE_DISBURSEMENT_SCHEDULES: true
@@ -351,23 +358,21 @@ g2pBridgeCeleryWorkers:
     pullPolicy: Always
 
   envVars:
-    G2P_BRIDGE_CELERY_WORKERS_DB_HOSTNAME: '{{ .Values.global.postgresqlHost }}' 
+    G2P_BRIDGE_CELERY_WORKERS_DB_HOSTNAME: '{{ .Values.global.postgresqlHost }}'
     G2P_BRIDGE_CELERY_WORKERS_DB_DBNAME: '{{ tpl .Values.global.bridgeDB $ }}'
     G2P_BRIDGE_CELERY_WORKERS_DB_PORT: 5432
     G2P_BRIDGE_CELERY_WORKERS_DB_USERNAME: '{{ tpl .Values.global.bridgeDBUser $ }}'
     G2P_BRIDGE_CELERY_WORKERS_CELERY_BROKER_URL: redis://{{ tpl .Values.global.redisInstallationName $ }}:6379/0
     G2P_BRIDGE_CELERY_WORKERS_CELERY_BACKEND_URL: redis://{{ tpl .Values.global.redisInstallationName $ }}:6379/0
-    
+
     G2PCONNECT_MAPPER_CLIENT_API_BASE_URL: '{{ .Values.global.g2pBridgeMapperBaseUrl }}'
     G2P_BRIDGE_CELERY_WORKERS_MAPPER_REQUEST_SENDER_ID: openg2p-g2p-bridge
-    
+
     G2P_BRIDGE_CELERY_WORKERS_KEYMANAGER_API_BASE_URL: 'http://{{ .Values.global.keymanagerInstallationName }}/v1/keymanager'
     G2P_BRIDGE_CELERY_WORKERS_KEYMANAGER_SIGN_APP_ID: '{{ .Values.global.g2pBridgeKeymanagerAppId }}'
     G2P_BRIDGE_CELERY_WORKERS_OAUTH_ENABLED: '{{ .Values.global.g2pBridgeKeymanagerAuthEnabled }}'
     G2P_BRIDGE_CELERY_WORKERS_OAUTH_URL: '{{ tpl .Values.global.keycloakIssuerUrl $ }}/protocol/openid-connect/token'
     G2P_BRIDGE_CELERY_WORKERS_OAUTH_CLIENT_ID: '{{ tpl .Values.global.g2pBridgeAuthClientId $ }}'
-    G2P_BRIDGE_CELERY_WORKERS_OAUTH_CLIENT_SECRET: '{{ .Values.global.g2pBridgeAuthClientSecret }}'
-
     G2P_BRIDGE_CELERY_WORKERS_DB_HOSTNAME_PBMS: "{{ tpl .Values.global.PBMSDBHostname $ }}"
     G2P_BRIDGE_CELERY_WORKERS_DB_DBNAME_PBMS: '{{ tpl .Values.global.PBMSDB $ }}'
     G2P_BRIDGE_CELERY_WORKERS_DB_PORT_PBMS: 5432
@@ -402,9 +407,9 @@ g2pBridgeCeleryWorkers:
     G2P_BRIDGE_MAPPER_CONNECTORS_DB_HOSTNAME_REGISTRY: "{{ tpl .Values.global.registryDBHostname $ }}"
     G2P_BRIDGE_MAPPER_CONNECTORS_DB_PORT_REGISTRY: 5432
     G2P_BRIDGE_MAPPER_CONNECTORS_DB_DBNAME_REGISTRY:  '{{ tpl .Values.global.registryDB $ }}'
-    
+
     G2P_BRIDGE_CELERY_WORKERS_SUPPRESS_NOTIFICATIONS: true
-    
+
     G2P_BRIDGE_CELERY_WORKERS_AGENCY_ALLOCATION_MAX_ATTEMPTS: 3
     G2P_BRIDGE_CELERY_WORKERS_WAREHOUSE_ALLOCATION_MAX_ATTEMPTS: 3
     G2P_BRIDGE_CELERY_WORKERS_GEO_RESOLUTION_MAX_ATTEMPTS: 3
@@ -416,7 +421,7 @@ g2pBridgeCeleryWorkers:
     G2P_BRIDGE_CELERY_WORKERS_AGENCY_NOTIFICATION_MAX_ATTEMPTS: 3
     G2P_BRIDGE_CELERY_WORKERS_WAREHOUSE_NOTIFICATION_MAX_ATTEMPTS: 3
     G2P_BRIDGE_CELERY_WORKERS_BENEFICIARY_NOTIFICATION_MAX_ATTEMPTS: 3
-  
+
   envVarsFrom:
     G2P_BRIDGE_CELERY_WORKERS_DB_PASSWORD:
       secretKeyRef:
@@ -442,6 +447,10 @@ g2pBridgeCeleryWorkers:
       secretKeyRef:
         name: '{{ tpl .Values.global.PBMSDBSecret $ }}'
         key: '{{ tpl .Values.global.PBMSDBUserPasswordKey $ }}'
+    G2P_BRIDGE_CELERY_WORKERS_OAUTH_CLIENT_SECRET:
+      secretKeyRef:
+        name: '{{ tpl .Values.global.g2pBridgeAuthClientSecret $ }}'
+        key: '{{ tpl .Values.global.g2pBridgeAuthClientSecretKey $ }}'
 
   postgresCheckerInit:
     enabled: true
@@ -484,4 +493,3 @@ redis:
       enabled: false
   auth:
     enabled: false
-
