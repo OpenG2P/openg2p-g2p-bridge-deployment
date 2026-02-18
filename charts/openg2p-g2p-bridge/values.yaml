@@ -11,7 +11,7 @@ global:
   # Default name of Redis that is installed with this chart
   redisInstallationName: '{{ .Release.Name }}-redis-master'
 
-  g2pBridgeHostname: g2p-bridge.devops.openg2p.org
+  g2pBridgeHostname: g2p-bridge.dev.openg2p.org
 
   g2pBridgeExampleBankBaseUrl: http://openg2p-g2p-bridge-example-bank-api
 
@@ -97,10 +97,11 @@ g2pBridgeApi:
     enabled: true
     virtualservice:
       enabled: true
+      host: '{{ tpl .Values.g2pBridgeApi.hostname $ }}'
       gateway: "internal"
       destination: '{{ template "common.names.fullname" . }}'
       destinationPort: 80
-      prefix: '{{ .Values.openapiRootPath }}/'
+      prefix: '{{ .Values.g2pBridgeApi.openapiRootPath }}'
       rewriteUri: "/"
     gateway:
       enabled: false
@@ -111,7 +112,7 @@ g2pBridgeApi:
     G2P_BRIDGE_DB_PORT: 5432
     G2P_BRIDGE_DB_USERNAME: '{{ tpl .Values.global.bridgeDBUser $ }}'
     G2P_BRIDGE_PORT: '{{ .Values.containerPort }}'
-    G2P_BRIDGE_OPENAPI_ROOT_PATH: '{{ .Values.openapiRootPath }}'
+    G2P_BRIDGE_OPENAPI_ROOT_PATH: '{{ .Values.g2pBridgeApi.openapiRootPath }}'
 
     G2P_BRIDGE_JWT_VALIDATE_KEYMANAGER_APP_ID: '{{ .Values.global.g2pBridgeKeymanagerAppId }}'
     G2P_BRIDGE_KEYMANAGER_API_BASE_URL: "http://{{ .Values.global.keymanagerInstallationName }}/v1/keymanager"
@@ -179,7 +180,7 @@ g2pBridgeApi:
 openg2pG2pBridgeBenePortalApi:
   enabled: true
   nameOverride: bene-portal-api
-  hostname: g2p-bridge-bene-portal.openg2p.sandbox.net
+  hostname: g2p-bridge-bene-portal.openg2p.dev.net
   replicaCount: 1
   autoscaling:
     enabled: false
@@ -215,13 +216,23 @@ openg2pG2pBridgeBenePortalApi:
     enabled: true
     virtualservice:
       enabled: true
+      host: '{{ tpl .Values.openg2pG2pBridgeBenePortalApi.hostname $ }}'
       gateway: "internal"
       destination: '{{ template "common.names.fullname" . }}'
       destinationPort: 80
-      prefix: '{{ .Values.openapiRootPath }}/'
+      prefix: '{{ .Values.openapiRootPath }}'
       rewriteUri: "/"
     gateway:
       enabled: false
+      host: '{{ tpl .Values.openg2pG2pBridgeBenePortalApi.hostname $ }}'
+      ingressController:
+        istio: ingressgateway
+      httpTlsRedirect: false
+      httpEnabled: true
+      httpsEnabled: false
+      tls:
+        mode: SIMPLE
+        credentialName: ""
 
   envVars:
     BRIDGE_BENE_PORTAL_API_DB_HOSTNAME: '{{ .Values.global.postgresqlHost }}'
