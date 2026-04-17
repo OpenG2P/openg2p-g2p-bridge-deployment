@@ -76,7 +76,7 @@ g2pBridgeApi:
     name: ""
   image:
     repository: openg2p/openg2p-g2p-bridge-partner-api
-    tag: "2.0"
+    tag: "2.1.0"
     pullPolicy: Always
   podSecurityContext:
     enabled: false
@@ -195,7 +195,7 @@ openg2pG2pBridgeBenePortalApi:
     name: ""
   image:
     repository: openg2p/openg2p-g2p-bridge-bene-portal-api
-    tag: "2.0"
+    tag: "2.1.0"
     pullPolicy: Always
   podSecurityContext:
     enabled: false
@@ -299,7 +299,7 @@ g2pBridgeCeleryBeatProducers:
   replicaCount: 1
   image:
     repository: openg2p/openg2p-g2p-bridge-celery-beat-producers
-    tag: "2.0"
+    tag: "2.1.0"
     pullPolicy: Always
 
   envVars:
@@ -365,7 +365,7 @@ g2pBridgeCeleryWorkers:
   replicaCount: 1
   image:
     repository: openg2p/openg2p-g2p-bridge-celery-workers
-    tag: "2.0"
+    tag: "2.1.0"
     pullPolicy: Always
 
   envVars:
