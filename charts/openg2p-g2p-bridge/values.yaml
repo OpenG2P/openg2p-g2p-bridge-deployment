@@ -33,15 +33,15 @@ global:
 
   PBMSDBHostname: commons-postgresql
   PBMSDB: pbms_db
-  PBMSDBUser: pbms_db_user
+  PBMSDBUser: pbms-db-user
   PBMSDBSecret: pbms
-  PBMSDBUserPasswordKey: pbms_db_user
+  PBMSDBUserPasswordKey: pbms-db-user
 
   registryDBHostname: commons-postgresql
   registryDB: registry_db
-  registryDBUser: registry_db_user
+  registryDBUser: registry-db-user
   registryDBSecret: registry
-  registryDBUserPasswordKey: registry_db_user
+  registryDBUserPasswordKey: registry-db-user
 
 postgres-init:
   enabled: true
@@ -112,7 +112,7 @@ g2pBridgeApi:
     G2P_BRIDGE_DB_PORT: 5432
     G2P_BRIDGE_DB_USERNAME: '{{ tpl .Values.global.bridgeDBUser $ }}'
     G2P_BRIDGE_PORT: '{{ .Values.containerPort }}'
-    G2P_BRIDGE_OPENAPI_ROOT_PATH: '{{ .Values.g2pBridgeApi.openapiRootPath }}'
+    G2P_BRIDGE_OPENAPI_ROOT_PATH: '{{ .Values.openapiRootPath }}'
 
     G2P_BRIDGE_JWT_VALIDATE_KEYMANAGER_APP_ID: '{{ .Values.global.g2pBridgeKeymanagerAppId }}'
     G2P_BRIDGE_KEYMANAGER_API_BASE_URL: "http://{{ .Values.global.keymanagerInstallationName }}/v1/keymanager"
